@@ -1,0 +1,196 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF"
+            tools:context="com.teamtrack.fragments.LoginFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:text="Create a schedule"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Customer Name"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/et_customer_name"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:background="@drawable/curvedborder_grey"
+                android:maxLines="1"
+                android:paddingLeft="4dp"
+                android:textSize="14sp"
+                tools:text="Prabhu"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Description"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/et_description"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/curvedborder_grey"
+                android:inputType="text"
+                android:gravity="start"
+                android:maxLength="60"
+                android:padding="4dp"
+                android:textSize="14sp"
+                tools:text="TV Installation"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Location"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/et_location"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/curvedborder_grey"
+                android:inputType="text"
+                android:maxLines="1"
+                android:paddingLeft="4dp"
+                android:textSize="14sp"
+                tools:text="Velachery, Chennai"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Location Radius Limit(In meters)"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/et_radius_limit"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:inputType="number"
+                android:background="@drawable/curvedborder_grey"
+                android:maxLines="1"
+                android:paddingLeft="4dp"
+                android:textSize="14sp"
+                tools:text="500"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Sales Person"
+                android:textSize="10sp"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+                <Spinner
+                    android:id="@+id/spinner_sales"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:background="@drawable/curvedborder_grey"
+                    android:gravity="center_vertical"
+                    tools:listitem="@android:layout/simple_spinner_item"/>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_margin="3dp"
+                    android:src="@drawable/spinner_down"
+                    android:tint="@color/colorPrimaryDark"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Remarks"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/et_remarks"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/curvedborder_grey"
+                android:inputType="text"
+                android:gravity="start"
+                android:padding="4dp"
+                android:textSize="14sp"
+                tools:text="Installation completed."/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:text="Status"
+                android:textSize="10sp"/>
+
+            <TextView
+                android:id="@+id/tv_status"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/curvedborder_grey"
+                android:gravity="center_vertical"
+                android:paddingLeft="4dp"
+                android:text="Open"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/btn_create_schedule"
+                android:layout_width="match_parent"
+                android:background="@color/colorAccent"
+                android:textColor="#FFFFFF"
+                android:layout_height="40dp"
+                android:layout_margin="24dp"
+                android:text="Create"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
