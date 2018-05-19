@@ -20,9 +20,9 @@ import com.network.VolleySingleton;
 import com.network.requests.GSONRequest;
 import com.teamtrack.BuildConfig;
 import com.teamtrack.R;
+import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.model.response.RegisterUserResponse;
-import com.teamtrack.model.response.ValidateOtpResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -146,13 +146,19 @@ public class LoginFragment extends Fragment {
         params.put("mobile", mobile);
         params.put("otp", otp);
 
-        GSONRequest request = new GSONRequest(Request.Method.POST, BuildConfig.SERVER_URL, ValidateOtpResponse.class, params,
-                new Response.Listener<ValidateOtpResponse>() {
+        GSONRequest request = new GSONRequest(Request.Method.POST, BuildConfig.SERVER_URL, RegisterUserResponse.class, params,
+                new Response.Listener<RegisterUserResponse>() {
                     @Override
-                    public void onResponse(ValidateOtpResponse response) {
-
-//                        Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_ID, "");
-
+                    public void onResponse(RegisterUserResponse response) {
+                        Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_ID, response.getEmpId());
+                        Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_NAME, response.getEmpName());
+                        if (response.getDesignation_id().equals("1")) {
+                            userType = "MANAGER";
+                        } else {
+                            userType = "SALES";
+                        }
+                        Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_TYPE, userType);
+                        Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_REF_ID, response.getUnique_ref_id());
                         loadUserHome();
                         if (mListener != null) {
                             mListener.hideLoading();

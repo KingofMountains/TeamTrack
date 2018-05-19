@@ -28,7 +28,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.teamtrack.R;
 import com.teamtrack.database.DatabaseHelper;
-import com.teamtrack.database.tables.Schedule;
+import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
     EditText etRemarks;
     Button btnCheckIn;
     String streetAddress;
-    Schedule data;
+    Meetings data;
     int radiusLimit = 0;
     private FusedLocationProviderClient mFusedLocationClient;
 
@@ -254,7 +254,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                 mListener.hideLoading();
             }
             if (result != null && result.equalsIgnoreCase("success")) {
-                Toast.makeText(thisActivity, "Schedule updated successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(thisActivity, "Meetings updated successfully!", Toast.LENGTH_SHORT).show();
                 getFragmentManager().popBackStack();
             } else {
                 Toast.makeText(thisActivity, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();

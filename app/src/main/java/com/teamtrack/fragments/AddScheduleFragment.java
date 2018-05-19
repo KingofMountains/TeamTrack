@@ -17,7 +17,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.teamtrack.R;
-import com.teamtrack.database.tables.Schedule;
+import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.database.tables.User;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
@@ -131,7 +131,7 @@ public class AddScheduleFragment extends Fragment {
                 && etRemarks.getText().toString().length() > 0
                 && selectedSalesPerson.length() > 0) {
 
-            final Schedule schedule = new Schedule();
+            final Meetings schedule = new Meetings();
 
             schedule.setCustomerName(etCustomerName.getText().toString());
             schedule.setDescription(etDescription.getText().toString());
@@ -149,8 +149,8 @@ public class AddScheduleFragment extends Fragment {
 
     private class CreateScheduleTask extends AsyncTask<String, Void, String> {
 
-        Schedule schedule;
-        private CreateScheduleTask(Schedule schedule) {
+        Meetings schedule;
+        private CreateScheduleTask(Meetings schedule) {
             this.schedule = schedule;
         }
 

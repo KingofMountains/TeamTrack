@@ -13,7 +13,8 @@ public class Preferences {
     public enum Key {
         EMPLOYEE_NAME,
         EMPLOYEE_ID,
-        EMPLOYEE_TYPE
+        EMPLOYEE_TYPE,
+        EMPLOYEE_REF_ID,
     }
 
     private Preferences(Context context) {
@@ -69,5 +70,9 @@ public class Preferences {
         edit();
         mEditor.putString(key.name(), value);
         commit();
+    }
+
+    public String getString(Key key) {
+        return sharedPreferences.getString(key.name(), null);
     }
 }

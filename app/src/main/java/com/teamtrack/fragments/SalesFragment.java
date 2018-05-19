@@ -2,12 +2,10 @@ package com.teamtrack.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.teamtrack.R;
-import com.teamtrack.adapters.SchedulesAdapter;
-import com.teamtrack.database.tables.Schedule;
+import com.teamtrack.adapters.MeetingsAdapter;
+import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnItemSelectedListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
@@ -34,8 +32,8 @@ public class SalesFragment extends Fragment implements OnItemSelectedListener {
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
     RecyclerView rvSchedules;
-    SchedulesAdapter adapter;
-    List<Schedule> scheduleList = new ArrayList<>();
+    MeetingsAdapter adapter;
+    List<Meetings> scheduleList = new ArrayList<>();
     LinearLayoutManager layoutManager;
 
     public SalesFragment() {
@@ -48,7 +46,7 @@ public class SalesFragment extends Fragment implements OnItemSelectedListener {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_home_sales, container, false);
         }
@@ -79,24 +77,25 @@ public class SalesFragment extends Fragment implements OnItemSelectedListener {
 
     private void init() {
 
-        if (ContextCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(thisActivity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
-        }
-
         rvSchedules = view.findViewById(R.id.rv_schedules);
         layoutManager = new LinearLayoutManager(thisActivity, LinearLayoutManager.VERTICAL, false);
 
-        new GetSchedulesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Schedule>() {
+        getMeetings();
+
+    }
+
+    private void getMeetings() {
+        new GetSchedulesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
             @Override
-            public void onTaskCompleted(List<Schedule> list) {
-                scheduleList = list;
-                adapter = new SchedulesAdapter(list, SalesFragment.this,"SALES");
-                rvSchedules.setAdapter(adapter);
-                rvSchedules.setLayoutManager(layoutManager);
+            public void onTaskCompleted(List<Meetings> list) {
+                if (list != null) {
+                    scheduleList = list;
+                    adapter = new MeetingsAdapter(list, SalesFragment.this, "SALES");
+                    rvSchedules.setAdapter(adapter);
+                    rvSchedules.setLayoutManager(layoutManager);
+                }
             }
         }).execute("");
-
     }
 
     @Override

@@ -8,18 +8,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teamtrack.R;
-import com.teamtrack.database.tables.Schedule;
+import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnItemSelectedListener;
 
 import java.util.List;
 
-public class SchedulesAdapter extends RecyclerView.Adapter<SchedulesAdapter.ViewHolder> {
+public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHolder> {
 
-    List<Schedule> scheduleList;
+    List<Meetings> scheduleList;
     OnItemSelectedListener listener;
     String from;
 
-    public SchedulesAdapter(List<Schedule> scheduleList, OnItemSelectedListener listener, String from) {
+    public MeetingsAdapter(List<Meetings> scheduleList, OnItemSelectedListener listener, String from) {
         this.scheduleList = scheduleList;
         this.listener = listener;
         this.from = from;
@@ -28,13 +28,13 @@ public class SchedulesAdapter extends RecyclerView.Adapter<SchedulesAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SchedulesAdapter.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedules, parent, false));
+        return new MeetingsAdapter.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedules, parent, false));
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        final Schedule data = scheduleList.get(holder.getAdapterPosition());
+        final Meetings data = scheduleList.get(holder.getAdapterPosition());
 
         if (from.equalsIgnoreCase("SALES")) {
             holder.visibleAdminView(View.GONE);
@@ -76,7 +76,7 @@ public class SchedulesAdapter extends RecyclerView.Adapter<SchedulesAdapter.View
         }
 
         @SuppressWarnings("deprecation")
-        public void setValues(Schedule data) {
+        public void setValues(Meetings data) {
             tvCustomerName.setText(data.getCustomerName());
             tvDescription.setText(data.getDescription());
             tvLocation.setText(data.getLocation());

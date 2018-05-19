@@ -13,12 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.teamtrack.R;
-import com.teamtrack.adapters.SchedulesAdapter;
-import com.teamtrack.database.tables.Schedule;
+import com.teamtrack.adapters.ReporteesAdapter;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnItemSelectedListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.tasks.GetSchedulesTask;
+import com.teamtrack.model.Reportees;
+import com.teamtrack.tasks.GetReporteesTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +26,15 @@ import java.util.List;
 /**
  * A login screen that offers login via email/password.
  */
-public class AdminFragment extends Fragment implements OnItemSelectedListener{
+public class AdminFragment extends Fragment implements OnItemSelectedListener {
 
     View view;
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
     FloatingActionButton floatButtonAddSchedule;
     RecyclerView rvSchedules;
-    SchedulesAdapter adapter;
-    List<Schedule> scheduleList = new ArrayList<>();
+    ReporteesAdapter adapter;
+    List<Reportees> reporteesList = new ArrayList<>();
     LinearLayoutManager layoutManager;
 
     public AdminFragment() {
@@ -77,15 +77,7 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener{
         rvSchedules = view.findViewById(R.id.rv_schedules_admin);
         layoutManager = new LinearLayoutManager(thisActivity, LinearLayoutManager.VERTICAL, false);
 
-        new GetSchedulesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Schedule>() {
-            @Override
-            public void onTaskCompleted(List<Schedule> list) {
-                scheduleList = list;
-                adapter = new SchedulesAdapter(list, AdminFragment.this,"ADMIN");
-                rvSchedules.setAdapter(adapter);
-                rvSchedules.setLayoutManager(layoutManager);
-            }
-        }).execute("");
+        getEmployeeList();
 
         floatButtonAddSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,9 +90,25 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener{
 
     }
 
+    private void getEmployeeList() {
+
+        new GetReporteesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Reportees>() {
+            @Override
+            public void onTaskCompleted(List<Reportees> list) {
+                reporteesList = list;
+                adapter = new ReporteesAdapter(list, AdminFragment.this);
+                rvSchedules.setAdapter(adapter);
+                rvSchedules.setLayoutManager(layoutManager);
+            }
+        }).execute("");
+
+    }
+
     @Override
     public void onItemSelected(int position) {
-
+        if (mListener != null) {
+            mListener.onFragmentInteraction("SALES");
+        }
     }
 
 }

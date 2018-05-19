@@ -8,6 +8,9 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,13 +49,27 @@ public class GSONRequest extends Request {
 
     @Override
     protected Response parseNetworkResponse(NetworkResponse response) {
+        String jsonString;
         try {
-            String jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "utf-8"));
-            return Response.success(gson.fromJson(jsonString, responseClass), HttpHeaderParser.parseCacheHeaders(response));
+            jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+            try {
+                JSONObject result = new JSONObject(jsonString);
+                if (result.has("success") && result.getBoolean("success") && result.has("responseData")) {
+
+                    JSONObject responseData = result.getJSONArray("responseData").getJSONObject(0);
+
+                    return Response.success(gson.fromJson(responseData.toString(), responseClass), HttpHeaderParser.parseCacheHeaders
+                            (response));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return Response.error(new ParseError(e));
         }
+
+        return Response.error(new ParseError(new Exception(jsonString)));
     }
 
     @Override

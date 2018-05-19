@@ -3,19 +3,19 @@ package com.teamtrack.tasks;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnTaskCompletionListener;
+import com.teamtrack.model.Reportees;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class GetSchedulesTask extends AsyncTask<String, Integer, String> {
+public class GetReporteesTask extends AsyncTask<String, Integer, String> {
 
-    private List<Meetings> scheduleList;
+    private List<Reportees> reporteesList;
     private WeakReference<Context> context;
-    private OnTaskCompletionListener<Meetings> listener;
+    private OnTaskCompletionListener<Reportees> listener;
 
-    public GetSchedulesTask(Context context, OnTaskCompletionListener<Meetings> listener) {
+    public GetReporteesTask(Context context, OnTaskCompletionListener<Reportees> listener) {
         this.context = new WeakReference<>(context);
         this.listener = listener;
     }
@@ -29,7 +29,7 @@ public class GetSchedulesTask extends AsyncTask<String, Integer, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         if (listener != null) {
-            listener.onTaskCompleted(scheduleList);
+            listener.onTaskCompleted(reporteesList);
         }
     }
 }

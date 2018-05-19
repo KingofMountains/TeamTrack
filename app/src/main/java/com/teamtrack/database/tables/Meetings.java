@@ -7,7 +7,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 @Entity
-public class Schedule implements Parcelable {
+public class Meetings implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "schedule_id")
@@ -31,7 +31,7 @@ public class Schedule implements Parcelable {
     @ColumnInfo(name = "sales_location_time")
     private String sales_location_time;
 
-    protected Schedule(Parcel in) {
+    protected Meetings(Parcel in) {
         scheduleId = in.readInt();
         customerName = in.readString();
         location = in.readString();
@@ -44,7 +44,7 @@ public class Schedule implements Parcelable {
         sales_location_time = in.readString();
     }
 
-    public Schedule() {
+    public Meetings() {
         //empty constructor
     }
 
@@ -67,15 +67,15 @@ public class Schedule implements Parcelable {
         return 0;
     }
 
-    public static final Creator<Schedule> CREATOR = new Creator<Schedule>() {
+    public static final Creator<Meetings> CREATOR = new Creator<Meetings>() {
         @Override
-        public Schedule createFromParcel(Parcel in) {
-            return new Schedule(in);
+        public Meetings createFromParcel(Parcel in) {
+            return new Meetings(in);
         }
 
         @Override
-        public Schedule[] newArray(int size) {
-            return new Schedule[size];
+        public Meetings[] newArray(int size) {
+            return new Meetings[size];
         }
     };
 

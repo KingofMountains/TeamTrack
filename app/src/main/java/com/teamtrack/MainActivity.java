@@ -1,10 +1,16 @@
 package com.teamtrack;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     ProgressDialog dialog;
     private DrawerLayout drawerLayout;
+    LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +40,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     private void initialize() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Team Track");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -41,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                         // set item as selected to persist highlight
                         menuItem.setChecked(true);
                         // close drawer when item is tapped
@@ -55,8 +64,46 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                     }
                 });
         configureProgressLoading();
-        loadUserHome();
+
+        CheckGpsStatus();
     }
+
+    public void CheckGpsStatus() {
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean GpsStatus = false;
+        if (locationManager != null) {
+            GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+        if (GpsStatus) {
+            loadUserHome();
+        } else {
+            showGPSAlert();
+        }
+
+    }
+
+    private void showGPSAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Turn On GPS")
+                .setMessage("You have to turn on GPS to access the application!")
+                .setPositiveButton("Turn On", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
+
 
     private void loadMenuItemScreen(MenuItem menuItem) {
         switch (menuItem.getTitle().toString()) {
@@ -101,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 }
             }
         } else {
-            loadAdminFragment();
+            loadSalesFragment();
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
