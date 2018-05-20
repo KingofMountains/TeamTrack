@@ -41,7 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:hint="One Time Password"
-                    android:inputType="number"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"/>
 
@@ -83,7 +83,7 @@
                     android:layout_height="45dp"
                     android:hint="@string/prompt_mobile_no"
                     android:imeActionLabel="@string/action_sign_in_short"
-                    android:inputType="textPassword"
+                    android:inputType="number"
                     android:maxLines="1"
                     android:singleLine="true"/>
 

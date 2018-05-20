@@ -1,12 +1,13 @@
 package com.teamtrack.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.teamtrack.R;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
+import com.teamtrack.model.Reportees;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,8 +29,10 @@ import com.teamtrack.listeners.OnFragmentInteractionListener;
  */
 public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
 
-    private OnFragmentInteractionListener mListener;
     private View view;
+    private Reportees data;
+    private TextView tvEmployeeName, tvLastUpdated;
+    private double latitude, longitude;
 
     public LocateTeamFragment() {
         // Required empty public constructor
@@ -44,7 +48,7 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_locate_team, container, false);
@@ -62,30 +66,40 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
 
     private void init() {
 
-    }
+        tvEmployeeName = view.findViewById(R.id.tv_location_team_employee_name);
+        tvLastUpdated = view.findViewById(R.id.tv_location_team_employee_last_known_time);
+        Bundle extras = getArguments();
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+        if (extras != null && extras.containsKey("selected_item")) {
+            data = extras.getParcelable("selected_item");
+            if (data != null) {
+
+                tvEmployeeName.setText(data.getEmpName() != null ? data.getEmpName() : "null");
+                tvLastUpdated.setText(data.getLastUpdatedLocation() != null ? data.getLastUpdatedLocation() : "null");
+
+                try {
+                    latitude = Double.valueOf(data.getLatitude());
+                    longitude = Double.valueOf(data.getLongitude());
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    setDefaultLocation();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                    setDefaultLocation();
+                }
+            }
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    private void setDefaultLocation() {
+        latitude = 11.0168;
+        longitude = 76.9558;
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        GoogleMap mMap = googleMap;
-        LatLng empLocation = new LatLng(11.0168, 76.9558);
-        mMap.addMarker(new MarkerOptions().position(empLocation).title("Employee Name"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(empLocation));
+        LatLng empLocation = new LatLng(latitude, longitude);
+        googleMap.addMarker(new MarkerOptions().position(empLocation).title(data.getEmpName()));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(empLocation , 12));
     }
 }

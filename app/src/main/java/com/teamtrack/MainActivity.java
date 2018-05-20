@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,10 +14,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.fragments.AddScheduleFragment;
 import com.teamtrack.fragments.AdminFragment;
 import com.teamtrack.fragments.LocateTeamFragment;
@@ -40,9 +43,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     private void initialize() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Team Track");
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -51,15 +51,15 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
+
+                        if (!menuItem.isChecked()) {
+                            // set item as selected to persist highlight
+                            menuItem.setChecked(true);
+
+                            loadMenuItemScreen(menuItem);
+                        }
                         // close drawer when item is tapped
                         drawerLayout.closeDrawers();
-
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-
-                        loadMenuItemScreen(menuItem);
                         return true;
                     }
                 });
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         if (locationManager != null) {
             GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         }
-        if (GpsStatus) {
+        if (GpsStatus || Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
             loadUserHome();
         } else {
             showGPSAlert();
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 loadAddScheduleFragment();
                 break;
             case "Locate Team":
-                loadLocateTeamFragment();
+                loadAdminFragment("LOCATE_ME");
                 break;
             case "Logout":
                 logout();
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 if (userType != null) {
                     switch (userType) {
                         case "MANAGER":
-                            loadAdminFragment();
+                            loadAdminFragment("HOME");
                             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                             break;
                         case "SALES_PERSON":
@@ -171,8 +171,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_logout) {
-            logout();
+        if (id == R.id.action_menu) {
+            drawerLayout.openDrawer(Gravity.END);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -196,24 +196,37 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     @Override
-    public void onFragmentInteraction(String from, Bundle bundle) {
-        loadScheduleDetailsFragment(bundle);
+    public void onFragmentInteraction(String action, Bundle bundle) {
+        switch (action) {
+            case "SALES":
+                loadScheduleDetailsFragment(bundle);
+                break;
+            case "LOCATE_ME":
+                loadLocateTeamFragment(bundle);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void showLoading() {
-        dialog.show();
+        if (dialog != null) {
+            dialog.show();
+        }
     }
 
     @Override
     public void hideLoading() {
-        dialog.dismiss();
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
     }
 
     private void loadAddScheduleFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_right, 0)
+//                .setCustomAnimations(R.anim.slide_in_right, 0)
                 .replace(R.id.fragment_container, AddScheduleFragment.newInstance(), "AddScheduleFragment")
                 .addToBackStack("AddScheduleFragment")
                 .commit();
@@ -238,19 +251,33 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 .commit();
     }
 
-    private void loadAdminFragment() {
+    private void loadAdminFragment(String from) {
+
+        AdminFragment fragment = AdminFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putString("from", from);
+        fragment.setArguments(bundle);
+
         getSupportFragmentManager()
                 .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, AdminFragment.newInstance(), "")
+                .replace(R.id.fragment_container, fragment, "AdminFragment")
                 .commit();
     }
 
-    private void loadLocateTeamFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
+    private void loadLocateTeamFragment(final Bundle bundle) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                LocateTeamFragment fragment = LocateTeamFragment.newInstance();
+                fragment.setArguments(bundle);
+                getSupportFragmentManager()
+                        .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, LocateTeamFragment.newInstance(), "")
-                .commit();
+                        .add(R.id.fragment_container, fragment, "LocateTeamFragment")
+                        .addToBackStack("LocateTeamFragment")
+                        .commit();
+            }
+        },100);
     }
 }

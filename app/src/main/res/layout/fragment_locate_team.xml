@@ -26,16 +26,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Employee Name"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/primaryLightColor"/>
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:id="@+id/tv_location_team_employee_last_known_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="Fri, 27 Apr 2018 12:08:56 PM"
             android:textColor="@color/primaryLightColor"/>
     </LinearLayout>

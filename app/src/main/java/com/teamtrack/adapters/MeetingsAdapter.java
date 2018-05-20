@@ -15,9 +15,9 @@ import java.util.List;
 
 public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHolder> {
 
-    List<Meetings> scheduleList;
-    OnItemSelectedListener listener;
-    String from;
+    private List<Meetings> scheduleList;
+    private OnItemSelectedListener listener;
+    private String from;
 
     public MeetingsAdapter(List<Meetings> scheduleList, OnItemSelectedListener listener, String from) {
         this.scheduleList = scheduleList;
@@ -49,7 +49,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
             @Override
             public void onClick(View view) {
                 if (listener != null)
-                    listener.onItemSelected(holder.getAdapterPosition());
+                    listener.onItemSelected(holder.getAdapterPosition(), "");
             }
         });
     }

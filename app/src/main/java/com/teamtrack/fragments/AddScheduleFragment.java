@@ -84,6 +84,8 @@ public class AddScheduleFragment extends Fragment {
             @Override
             public void onTaskCompleted(List<User> list) {
 
+                if (list == null)
+                    return;
 
                 for (User user : list) {
                     userList.add(user.getName());
@@ -91,6 +93,11 @@ public class AddScheduleFragment extends Fragment {
                 salesArrayAdapter = new ArrayAdapter<>(thisActivity, android.R.layout.simple_list_item_1, userList);
                 salesArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerSales.setAdapter(salesArrayAdapter);
+
+            }
+
+            @Override
+            public void onError(String errorMessage) {
 
             }
         }).execute("");
@@ -150,6 +157,7 @@ public class AddScheduleFragment extends Fragment {
     private class CreateScheduleTask extends AsyncTask<String, Void, String> {
 
         Meetings schedule;
+
         private CreateScheduleTask(Meetings schedule) {
             this.schedule = schedule;
         }

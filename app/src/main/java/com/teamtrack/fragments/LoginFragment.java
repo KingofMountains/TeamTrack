@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,6 @@ import com.teamtrack.R;
 import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.model.response.RegisterUserResponse;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginFragment extends Fragment {
 
@@ -112,14 +110,14 @@ public class LoginFragment extends Fragment {
             mListener.showLoading();
         }
 
-        Map<String, String> params = new HashMap<>();
-        params.put("emp_code", empCode);
-        params.put("mobile", mobileNo);
+        String url = BuildConfig.SERVER_URL + BuildConfig.REGISTER_USER_URL + "emp_code=" + empCode + "&mobile=" + mobileNo;
 
-        GSONRequest request = new GSONRequest(Request.Method.POST, BuildConfig.SERVER_URL, RegisterUserResponse.class, params,
+        GSONRequest request = new GSONRequest(Request.Method.GET, url, RegisterUserResponse.class, null,
                 new Response.Listener<RegisterUserResponse>() {
                     @Override
                     public void onResponse(RegisterUserResponse response) {
+
+                        Log.d("response :", response.getOtp());
                         btnNext.setText("Continue");
                         loadOTPView();
                         if (mListener != null) {
@@ -142,11 +140,9 @@ public class LoginFragment extends Fragment {
 
     private void validateOTP(String mobile, String otp) {
 
-        Map<String, String> params = new HashMap<>();
-        params.put("mobile", mobile);
-        params.put("otp", otp);
+        String url = BuildConfig.SERVER_URL + BuildConfig.VALIDATE_OTP_URL + "mobile=" + mobile + "&otp=" + otp;
 
-        GSONRequest request = new GSONRequest(Request.Method.POST, BuildConfig.SERVER_URL, RegisterUserResponse.class, params,
+        GSONRequest request = new GSONRequest(Request.Method.GET, url, RegisterUserResponse.class, null,
                 new Response.Listener<RegisterUserResponse>() {
                     @Override
                     public void onResponse(RegisterUserResponse response) {

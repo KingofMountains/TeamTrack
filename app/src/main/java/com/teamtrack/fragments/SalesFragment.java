@@ -82,6 +82,8 @@ public class SalesFragment extends Fragment implements OnItemSelectedListener {
 
         getMeetings();
 
+//      thisActivity.startService(new Intent(thisActivity, LocationService.class));
+
     }
 
     private void getMeetings() {
@@ -95,11 +97,16 @@ public class SalesFragment extends Fragment implements OnItemSelectedListener {
                     rvSchedules.setLayoutManager(layoutManager);
                 }
             }
+
+            @Override
+            public void onError(String errorMessage) {
+
+            }
         }).execute("");
     }
 
     @Override
-    public void onItemSelected(int position) {
+    public void onItemSelected(int position, String action) {
         if (mListener != null) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("selected_item", scheduleList.get(position));

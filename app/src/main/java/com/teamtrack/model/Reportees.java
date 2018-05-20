@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 @Entity
-public class Reportees implements Parcelable{
+public class Reportees implements Parcelable {
 
     @SerializedName("employee_id")
     private String empId;
@@ -25,6 +25,8 @@ public class Reportees implements Parcelable{
     private String latitude;
     @SerializedName("longitude")
     private String longitude;
+    @SerializedName("last_updated_location")
+    private String lastUpdatedLocation;
 
 
     protected Reportees(Parcel in) {
@@ -36,6 +38,25 @@ public class Reportees implements Parcelable{
         mobileNumber = in.readString();
         latitude = in.readString();
         longitude = in.readString();
+        lastUpdatedLocation = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(empId);
+        dest.writeString(empName);
+        dest.writeString(empCode);
+        dest.writeString(designationId);
+        dest.writeString(reportingTo);
+        dest.writeString(mobileNumber);
+        dest.writeString(latitude);
+        dest.writeString(longitude);
+        dest.writeString(lastUpdatedLocation);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Reportees> CREATOR = new Creator<Reportees>() {
@@ -114,20 +135,11 @@ public class Reportees implements Parcelable{
         this.longitude = longitude;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getLastUpdatedLocation() {
+        return lastUpdatedLocation;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(empId);
-        parcel.writeString(empName);
-        parcel.writeString(empCode);
-        parcel.writeString(designationId);
-        parcel.writeString(reportingTo);
-        parcel.writeString(mobileNumber);
-        parcel.writeString(latitude);
-        parcel.writeString(longitude);
+    public void setLastUpdatedLocation(String lastUpdatedLocation) {
+        this.lastUpdatedLocation = lastUpdatedLocation;
     }
 }

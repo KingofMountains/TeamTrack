@@ -36,11 +36,11 @@ public class SplashActivity extends AppCompatActivity implements OnFragmentInter
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     public void loadLoginFragment() {
 
-        if (Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_ID).equalsIgnoreCase("")) {
+        if (Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_ID) == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(R.anim.slide_in_right, 0)
-                    .replace(R.id.login_fragment_container, LoginFragment.newInstance(), "")
+                    .replace(R.id.login_fragment_container, LoginFragment.newInstance(), "LoginFragment")
                     .commit();
         } else {
             loadMainActivity(Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE));

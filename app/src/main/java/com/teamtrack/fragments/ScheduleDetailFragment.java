@@ -104,7 +104,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
             }
         });
 
-        if (extras != null) {
+        if (extras != null && extras.containsKey("selected_item")) {
             data = extras.getParcelable("selected_item");
             if (data != null) {
                 tvCustomerName.setText(data.getCustomerName());

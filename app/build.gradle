@@ -10,7 +10,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "SERVER_URL", "\"http://customerapi.rf.gd/\""
+        buildConfigField "String", "SERVER_URL", "\"http://api.ibevy.co.in/\""
+        buildConfigField "String", "REGISTER_USER_URL", "\"employee/register?\""
+        buildConfigField "String", "VALIDATE_OTP_URL", "\"employee/validateotp?\""
+        buildConfigField "String", "REPORTEE_LIST_OTP_URL", "\"manager/reportinglist?\""
     }
     buildTypes {
         release {

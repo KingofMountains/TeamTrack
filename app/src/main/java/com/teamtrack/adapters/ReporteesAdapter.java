@@ -15,18 +15,20 @@ import java.util.List;
 
 public class ReporteesAdapter extends RecyclerView.Adapter<ReporteesAdapter.ViewHolder> {
 
-    List<Reportees> reporteesList;
-    OnItemSelectedListener listener;
+    private List<Reportees> reporteesList;
+    private OnItemSelectedListener listener;
+    private String loadedFrom;
 
-    public ReporteesAdapter(List<Reportees> reporteesList, OnItemSelectedListener listener) {
+    public ReporteesAdapter(List<Reportees> reporteesList, OnItemSelectedListener listener, String loadedFrom) {
         this.reporteesList = reporteesList;
         this.listener = listener;
+        this.loadedFrom = loadedFrom;
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ReporteesAdapter.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedules, parent, false));
+        return new ReporteesAdapter.ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reportees, parent, false));
     }
 
     @Override
@@ -38,14 +40,7 @@ public class ReporteesAdapter extends RecyclerView.Adapter<ReporteesAdapter.View
             @Override
             public void onClick(View view) {
                 if (listener != null)
-                    listener.onItemSelected(holder.getAdapterPosition());
-            }
-        });
-
-        holder.tvLocateMe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
+                    listener.onItemSelected(holder.getAdapterPosition(),loadedFrom);
             }
         });
 
@@ -59,13 +54,12 @@ public class ReporteesAdapter extends RecyclerView.Adapter<ReporteesAdapter.View
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvReporteeName, tvLocateMe;
+        TextView tvReporteeName;
         LinearLayout lnrReportee;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvReporteeName = itemView.findViewById(R.id.tv_reportee_name);
-            tvLocateMe = itemView.findViewById(R.id.tv_locate_me);
             lnrReportee = itemView.findViewById(R.id.lnr_reportees_list);
         }
 

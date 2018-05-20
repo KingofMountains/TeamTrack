@@ -23,7 +23,6 @@ public class GSONRequest extends Request {
 
     private Response.Listener listener;
     private Map<String, String> mParams = new HashMap<>();
-    private Map<String, String> mHeaders = new HashMap<>();
     private Gson gson;
     private Class responseClass;
 
@@ -43,20 +42,29 @@ public class GSONRequest extends Request {
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
-        //TODO add headers
-        return this.mHeaders;
+        Map<String, String> params = new HashMap<>();
+        params.put("Content-Type", "application/json");
+        return params;
+    }
+
+    @Override
+    public String getBodyContentType() {
+        return super.getBodyContentType();
     }
 
     @Override
     protected Response parseNetworkResponse(NetworkResponse response) {
+
         String jsonString;
         try {
             jsonString = new String(response.data, HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+
+            System.out.println("json String : " + jsonString);
             try {
                 JSONObject result = new JSONObject(jsonString);
                 if (result.has("success") && result.getBoolean("success") && result.has("responseData")) {
 
-                    JSONObject responseData = result.getJSONArray("responseData").getJSONObject(0);
+                    JSONObject responseData = result.getJSONObject("responseData");
 
                     return Response.success(gson.fromJson(responseData.toString(), responseClass), HttpHeaderParser.parseCacheHeaders
                             (response));
