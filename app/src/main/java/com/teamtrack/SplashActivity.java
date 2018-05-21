@@ -60,7 +60,7 @@ public class SplashActivity extends AppCompatActivity implements OnFragmentInter
     }
 
     @Override
-    public void onFragmentInteraction(String userType) {
+    public void onFragmentInteraction(String userType,String... args) {
         loadMainActivity(userType);
     }
 

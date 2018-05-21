@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                             break;
                         case "SALES_PERSON":
-                            loadSalesFragment();
+                            loadSalesFragment(Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID));
                             break;
                         default:
                             break;
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 }
             }
         } else {
-            loadSalesFragment();
+            loadSalesFragment(Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID));
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
@@ -185,10 +185,13 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     @Override
-    public void onFragmentInteraction(String action) {
+    public void onFragmentInteraction(String action, String... args) {
         switch (action) {
             case "ADD_SCHEDULE":
                 loadAddScheduleFragment();
+                break;
+            case "SALES":
+                loadSalesFragment(args[0]);
                 break;
             default:
                 break;
@@ -243,12 +246,25 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 .commit();
     }
 
-    private void loadSalesFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
+    private void loadSalesFragment(String refID) {
+        if (refID != null && refID.equalsIgnoreCase("")) {
+            return;
+        }
+
+        if (Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
+            getSupportFragmentManager()
+                    .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, SalesFragment.newInstance(), "")
-                .commit();
+                    .add(R.id.fragment_container, SalesFragment.newInstance(refID), "SalesFragment")
+                    .addToBackStack("SalesFragment")
+                    .commit();
+        } else {
+            getSupportFragmentManager()
+                    .beginTransaction()
+//                .setCustomAnimations(R.anim.slide_in_right, 0)
+                    .replace(R.id.fragment_container, SalesFragment.newInstance(refID), "SalesFragment")
+                    .commit();
+        }
     }
 
     private void loadAdminFragment(String from) {
@@ -278,6 +294,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                         .addToBackStack("LocateTeamFragment")
                         .commit();
             }
-        },100);
+        }, 100);
     }
 }

@@ -2,21 +2,36 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:gravity="center_horizontal"
+              android:background="@android:color/white"
               android:orientation="vertical"
               tools:context="com.teamtrack.fragments.LoginFragment">
 
-    <TextView android:layout_height="40dp"
-              android:layout_width="match_parent"
-              android:gravity="center"
-              android:textColor="#FFFFFF"
-              android:textSize="16sp"
-              android:background="@color/colorPrimary"
-              android:text="Today's Schedules"/>
+    <!--<TextView android:layout_height="40dp"-->
+              <!--android:layout_width="match_parent"-->
+              <!--android:gravity="center"-->
+              <!--android:textColor="#FFFFFF"-->
+              <!--android:textSize="16sp"-->
+              <!--android:background="@color/colorPrimary"-->
+              <!--android:text="Today's Schedules"/>-->
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_schedules"
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/rv_schedules"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"/>-->
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_layout_sales"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:tabMode="fixed" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager_sales"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white" />
+
 
 </LinearLayout>

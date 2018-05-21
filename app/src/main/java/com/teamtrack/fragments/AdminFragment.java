@@ -89,7 +89,7 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
 
                 if (loadedFrom.equalsIgnoreCase("LOCATE_ME")) {
                     tvTitle.setText("Locate Team");
-                } else{
+                } else {
                     tvTitle.setText("Employees");
                 }
             }
@@ -142,7 +142,7 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
     public void onItemSelected(int position, String action) {
         if (mListener != null) {
             if (action.equalsIgnoreCase("HOME")) {
-                mListener.onFragmentInteraction("SALES");
+                mListener.onFragmentInteraction("SALES", reporteesList.get(position).getReferenceID());
             } else {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("selected_item", reporteesList.get(position));

@@ -100,6 +100,6 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         LatLng empLocation = new LatLng(latitude, longitude);
         googleMap.addMarker(new MarkerOptions().position(empLocation).title(data.getEmpName()));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(empLocation , 12));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(empLocation , 12));
     }
 }

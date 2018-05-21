@@ -19,6 +19,8 @@ public class Reportees implements Parcelable {
     private String designationId;
     @SerializedName("reporting_to")
     private String reportingTo;
+    @SerializedName("unique_ref_id")
+    private String referenceID;
     @SerializedName("mobile")
     private String mobileNumber;
     @SerializedName("latitude")
@@ -28,35 +30,17 @@ public class Reportees implements Parcelable {
     @SerializedName("last_updated_location")
     private String lastUpdatedLocation;
 
-
     protected Reportees(Parcel in) {
         empId = in.readString();
         empName = in.readString();
         empCode = in.readString();
         designationId = in.readString();
         reportingTo = in.readString();
+        referenceID = in.readString();
         mobileNumber = in.readString();
         latitude = in.readString();
         longitude = in.readString();
         lastUpdatedLocation = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(empId);
-        dest.writeString(empName);
-        dest.writeString(empCode);
-        dest.writeString(designationId);
-        dest.writeString(reportingTo);
-        dest.writeString(mobileNumber);
-        dest.writeString(latitude);
-        dest.writeString(longitude);
-        dest.writeString(lastUpdatedLocation);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     public static final Creator<Reportees> CREATOR = new Creator<Reportees>() {
@@ -70,6 +54,25 @@ public class Reportees implements Parcelable {
             return new Reportees[size];
         }
     };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(empId);
+        parcel.writeString(empName);
+        parcel.writeString(empCode);
+        parcel.writeString(designationId);
+        parcel.writeString(reportingTo);
+        parcel.writeString(referenceID);
+        parcel.writeString(mobileNumber);
+        parcel.writeString(latitude);
+        parcel.writeString(longitude);
+        parcel.writeString(lastUpdatedLocation);
+    }
 
     public String getEmpId() {
         return empId;
@@ -109,6 +112,14 @@ public class Reportees implements Parcelable {
 
     public void setReportingTo(String reportingTo) {
         this.reportingTo = reportingTo;
+    }
+
+    public String getReferenceID() {
+        return referenceID;
+    }
+
+    public void setReferenceID(String referenceID) {
+        this.referenceID = referenceID;
     }
 
     public String getMobileNumber() {
