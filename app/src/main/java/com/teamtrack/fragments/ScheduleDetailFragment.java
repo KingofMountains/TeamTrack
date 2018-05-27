@@ -27,9 +27,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.teamtrack.R;
-import com.teamtrack.database.DatabaseHelper;
-import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
+import com.teamtrack.model.Meetings;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -108,12 +107,12 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
             data = extras.getParcelable("selected_item");
             if (data != null) {
                 tvCustomerName.setText(data.getCustomerName());
-                tvLocation.setText(data.getLocation());
-                tvDescription.setText(data.getDescription());
-                etRemarks.setText(data.getRemarks());
-                tvStatus.setText(data.getStatus());
-                streetAddress = data.getLocation();
-                radiusLimit = data.getRadiusLimit();
+//                tvLocation.setText(data.getLocation());
+//                tvDescription.setText(data.getDescription());
+//                etRemarks.setText(data.getRemarks());
+//                tvStatus.setText(data.getStatus());
+//                streetAddress = data.getLocation();
+//                radiusLimit = data.getRadiusLimit();
             }
         }
     }
@@ -214,13 +213,6 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
 
             String returnStatus = null;
 
-            if (ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager
-                    .PERMISSION_GRANTED) {
-                Toast.makeText(thisActivity, "No Location permission!", Toast.LENGTH_SHORT).show();
-                return "no_permission";
-            }
-
             try {
                 Geocoder geocoder = new Geocoder(thisActivity);
                 List<Address> addresses;
@@ -231,9 +223,6 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                     DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
                     String date = df.format(Calendar.getInstance().getTime());
                     String sLocation = currentAddress.getSubLocality() + "," + currentAddress.getLocality();
-                    DatabaseHelper.getInstance(thisActivity).scheduleDao().updateSchedule("Completed",
-                            etRemarks.getText().toString(), sLocation, date,
-                            data.getScheduleId());
                     returnStatus = "success";
                 } else {
                     returnStatus = null;
@@ -255,7 +244,9 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
             }
             if (result != null && result.equalsIgnoreCase("success")) {
                 Toast.makeText(thisActivity, "Meetings updated successfully!", Toast.LENGTH_SHORT).show();
-                getFragmentManager().popBackStack();
+                if (getFragmentManager() != null) {
+                    getFragmentManager().popBackStack();
+                }
             } else {
                 Toast.makeText(thisActivity, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
             }

@@ -25,171 +25,387 @@
             android:orientation="vertical"
             android:padding="8dp">
 
-            <TextView
+            <RelativeLayout
+                android:id="@+id/relative_customer_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Customer Name"
-                android:textSize="10sp"/>
+                android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/et_customer_name"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:inputType="text"
-                android:background="@drawable/curvedborder_grey"
-                android:maxLines="1"
-                android:paddingLeft="4dp"
-                android:textSize="14sp"
-                tools:text="Prabhu"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Description"
-                android:textSize="10sp"/>
-
-            <EditText
-                android:id="@+id/et_description"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/curvedborder_grey"
-                android:inputType="text"
-                android:gravity="start"
-                android:maxLength="60"
-                android:padding="4dp"
-                android:textSize="14sp"
-                tools:text="TV Installation"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Location"
-                android:textSize="10sp"/>
-
-            <EditText
-                android:id="@+id/et_location"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/curvedborder_grey"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingLeft="4dp"
-                android:textSize="14sp"
-                tools:text="Velachery, Chennai"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Location Radius Limit(In meters)"
-                android:textSize="10sp"/>
-
-            <EditText
-                android:id="@+id/et_radius_limit"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:background="@drawable/curvedborder_grey"
-                android:maxLines="1"
-                android:paddingLeft="4dp"
-                android:textSize="14sp"
-                tools:text="500"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Sales Person"
-                android:textSize="10sp"/>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp">
-
-                <Spinner
-                    android:id="@+id/spinner_sales"
+                <TextView
+                    android:id="@+id/tv_customer_name"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:background="@drawable/curvedborder_grey"
+                    android:layout_margin="8dp"
+                    android:layout_toLeftOf="@+id/iv_customer"
+                    android:layout_toStartOf="@+id/iv_customer"
+                    android:background="@null"
                     android:gravity="center_vertical"
-                    tools:listitem="@android:layout/simple_spinner_item"/>
+                    android:hint="Customer Name"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_margin="3dp"
-                    android:src="@drawable/spinner_down"
-                    android:tint="@color/colorPrimaryDark"/>
+                    android:id="@+id/iv_customer"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_right_chevron"/>
 
-            </FrameLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
 
-            <TextView
+            <RelativeLayout
+                android:id="@+id/relative_customer_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_customer_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_margin="8dp"
+                    android:layout_toLeftOf="@+id/iv_customer_location"
+                    android:layout_toStartOf="@+id/iv_customer_location"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="Customer Location"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
+
+                <ImageView
+                    android:id="@+id/iv_customer_location"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_right_chevron"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_sales_person"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_sales_person"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_margin="8dp"
+                    android:layout_toLeftOf="@+id/iv_sales_person"
+                    android:layout_toStartOf="@+id/iv_sales_person"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="Sales Person"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
+
+                <ImageView
+                    android:id="@+id/iv_sales_person"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_right_chevron"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Date"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_meeting_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_below="@+id/tv_date"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:text="DD MMM YYYY"
+                    android:alpha="0.5"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Remarks"
-                android:textSize="10sp"/>
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/et_remarks"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/curvedborder_grey"
-                android:inputType="text"
-                android:gravity="start"
-                android:padding="4dp"
-                android:textSize="14sp"
-                tools:text="Installation completed."/>
+                <RelativeLayout
+                    android:id="@+id/relative_from_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
 
-            <TextView
+                    <TextView
+                        android:id="@+id/tv_from_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="From Time"
+                        android:textSize="12sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_meeting_from_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_below="@+id/tv_from_time"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:alpha="0.5"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:text="HH:MM AM"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/primaryLightColor"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/relative_to_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/tv_to_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="To Time"
+                        android:textSize="12sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_meeting_to_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_below="@+id/tv_to_time"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:alpha="0.5"
+                        android:text="HH:MM AM"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_alignParentBottom="true"
+                        android:background="@color/primaryLightColor"/>
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:text="Status"
-                android:textSize="10sp"/>
+                android:layout_marginTop="8dp">
 
-            <TextView
-                android:id="@+id/tv_status"
+                <TextView
+                    android:id="@+id/tv_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Status"
+                    android:textSize="12sp"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_status"
+                    android:layout_marginTop="8dp">
+
+                    <Spinner
+                        android:id="@+id/spinner_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/curved_border_grey"
+                        android:gravity="center_vertical"
+                        android:drawSelectorOnTop="true"
+                        android:entries="@array/status_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_margin="3dp"
+                        android:src="@drawable/spinner_down"
+                        android:tint="@color/colorPrimaryDark"/>
+
+
+
+                </FrameLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
+            <!--
+                        <RelativeLayout
+                            android:id="@+id/relative_status_from"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:id="@+id/tv_status_from"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Status Updated From"
+                                android:textSize="12sp"/>
+
+                            <EditText
+                                android:id="@+id/et_status_from"
+                                android:layout_width="match_parent"
+                                android:layout_height="35dp"
+                                android:layout_below="@+id/tv_status_from"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:gravity="center_vertical"
+                                android:inputType="date"
+                                android:maxLines="1"
+                                android:textColor="@android:color/black"
+                                android:textSize="14sp"
+                                tools:text="Hopes college, Coimbatore"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="0.5dp"
+                                android:layout_alignParentBottom="true"
+                                android:background="@color/primaryLightColor"/>
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/relative_status_on"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:id="@+id/tv_status_on"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Status Updated From"
+                                android:textSize="12sp"/>
+
+                            <EditText
+                                android:id="@+id/et_status_on"
+                                android:layout_width="match_parent"
+                                android:layout_height="35dp"
+                                android:layout_below="@+id/tv_status_on"
+                                android:layout_marginTop="4dp"
+                                android:background="@null"
+                                android:gravity="center_vertical"
+                                android:inputType="date"
+                                android:maxLines="1"
+                                android:textColor="@android:color/black"
+                                android:textSize="14sp"
+                                tools:text="25 May 2018 04:30PM"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="0.5dp"
+                                android:layout_alignParentBottom="true"
+                                android:background="@color/primaryLightColor"/>
+                        </RelativeLayout>
+            -->
+
+            <RelativeLayout
+                android:id="@+id/relative_description"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/curvedborder_grey"
-                android:gravity="center_vertical"
-                android:paddingLeft="4dp"
-                android:text="Open"
-                android:textSize="14sp"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Description"
+                    android:textSize="12sp"/>
+
+                <EditText
+                    android:id="@+id/et_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_below="@+id/tv_description"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/curved_border_grey"
+                    android:gravity="start"
+                    android:inputType="textMultiLine"
+                    android:maxLength="255"
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    tools:text="TV Installation"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/btn_create_schedule"
                 android:layout_width="match_parent"
-                android:background="@color/colorAccent"
-                android:textColor="#FFFFFF"
                 android:layout_height="40dp"
                 android:layout_margin="24dp"
-                android:text="Create"/>
+                android:background="@color/colorPrimaryDark"
+                android:text="Create"
+                android:textColor="#FFFFFF"/>
 
         </LinearLayout>
     </LinearLayout>

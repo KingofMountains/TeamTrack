@@ -120,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:background="@drawable/curvedborder_grey"
+                android:background="@drawable/curved_border_grey"
                 android:gravity="start"
                 android:hint="Enter remarks here.."
                 android:padding="4dp"

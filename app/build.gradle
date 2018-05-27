@@ -14,6 +14,9 @@ android {
         buildConfigField "String", "REGISTER_USER_URL", "\"employee/register?\""
         buildConfigField "String", "VALIDATE_OTP_URL", "\"employee/validateotp?\""
         buildConfigField "String", "REPORTEE_LIST_OTP_URL", "\"manager/reportinglist?\""
+        buildConfigField "String", "CUSTOMER_LIST_OTP_URL", "\"manager/customerlist?\""
+        buildConfigField "String", "CREATE_MEETING_URL", "\"manager/createmeeting?\""
+        buildConfigField "String", "MEETING_LIST_URL", "\"employee/meetinglist?\""
     }
     buildTypes {
         release {

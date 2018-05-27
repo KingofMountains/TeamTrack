@@ -65,9 +65,12 @@ public class GSONRequest extends Request {
                 if (result.has("success") && result.getBoolean("success") && result.has("responseData")) {
 
                     JSONObject responseData = result.getJSONObject("responseData");
-
-                    return Response.success(gson.fromJson(responseData.toString(), responseClass), HttpHeaderParser.parseCacheHeaders
-                            (response));
+                    if (responseData != null) {
+                        return Response.success(gson.fromJson(responseData.toString(), responseClass), HttpHeaderParser.parseCacheHeaders
+                                (response));
+                    } else {
+                        return Response.error(new ParseError(new Exception("Data Not Found!")));
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -1,9 +1,11 @@
 package com.teamtrack.fragments;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,35 +14,51 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.teamtrack.R;
-import com.teamtrack.database.tables.Meetings;
-import com.teamtrack.database.tables.User;
+import com.teamtrack.Utilities.Preferences;
+import com.teamtrack.listeners.OnDialogItemSelectedListener;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.tasks.GetAllSalesTask;
+import com.teamtrack.model.Customer;
+import com.teamtrack.model.CustomerLocation;
+import com.teamtrack.model.Meetings;
+import com.teamtrack.model.Reportees;
+import com.teamtrack.tasks.CreateMeetingTask;
+import com.teamtrack.tasks.GetCustomersTask;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A login screen that offers login via email/password.
  */
-public class AddScheduleFragment extends Fragment {
+public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSelectedListener<T> {
 
     View view;
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
-    List<String> userList = new ArrayList<>();
-    Spinner spinnerSales;
-    ArrayAdapter salesArrayAdapter;
-    String selectedSalesPerson = "";
     Button btnCreateSchedule;
-    EditText etCustomerName, etDescription, etLocation, etRadiusLimit, etRemarks;
-
+    Calendar myCalendar;
+    String mCustomerID = "", mCustomerName = "", mCustomerLocationID = "", mCustomerLocation = "", mSalesID = "", mSalesName = "",
+            mMeetingDate = "", mMeetingFromTime = "", mMeetingToTime = "", mMeetingStatus = "", mDesctiption = "";
+    ArrayAdapter adapter;
+    Spinner spinnerMeetingStatus;
+    TextView tvCustomerName, tvCustomerLocation, tvSalesPerson, tvMeetingDate, tvMeetingFrom, tvMeetingTo;
+    EditText txtMeetingDescription;
+    RelativeLayout layoutCustomerName, layoutCustomerLocation, layoutSalesPerson;
+    ArrayList<Reportees> reporteesList;
+    ArrayList<Customer> customerList;
 
     public AddScheduleFragment() {
         // Required empty public constructor
@@ -52,7 +70,7 @@ public class AddScheduleFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_add_schedule, container, false);
         }
@@ -78,48 +96,23 @@ public class AddScheduleFragment extends Fragment {
 
     private void init() {
 
-        spinnerSales = view.findViewById(R.id.spinner_sales);
-
-        new GetAllSalesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<User>() {
-            @Override
-            public void onTaskCompleted(List<User> list) {
-
-                if (list == null)
-                    return;
-
-                for (User user : list) {
-                    userList.add(user.getName());
-                }
-                salesArrayAdapter = new ArrayAdapter<>(thisActivity, android.R.layout.simple_list_item_1, userList);
-                salesArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerSales.setAdapter(salesArrayAdapter);
-
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-
-            }
-        }).execute("");
-
-        spinnerSales.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedSalesPerson = parent.getItemAtPosition(position).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
+        myCalendar = Calendar.getInstance();
         btnCreateSchedule = view.findViewById(R.id.btn_create_schedule);
-        etCustomerName = view.findViewById(R.id.et_customer_name);
-        etDescription = view.findViewById(R.id.et_description);
-        etLocation = view.findViewById(R.id.et_location);
-        etRadiusLimit = view.findViewById(R.id.et_radius_limit);
-        etRemarks = view.findViewById(R.id.et_remarks);
+        tvCustomerName = view.findViewById(R.id.tv_customer_name);
+        tvCustomerLocation = view.findViewById(R.id.tv_customer_location);
+        tvSalesPerson = view.findViewById(R.id.tv_sales_person);
+        tvMeetingDate = view.findViewById(R.id.tv_meeting_date);
+        tvMeetingFrom = view.findViewById(R.id.tv_meeting_from_time);
+        tvMeetingTo = view.findViewById(R.id.tv_meeting_to_time);
+        txtMeetingDescription = view.findViewById(R.id.et_description);
+        spinnerMeetingStatus = view.findViewById(R.id.spinner_status);
+        layoutCustomerName = view.findViewById(R.id.relative_customer_name);
+        layoutCustomerLocation = view.findViewById(R.id.relative_customer_location);
+        layoutSalesPerson = view.findViewById(R.id.relative_sales_person);
+
+        configureStatusSpinner();
+
+        getCustomerList();
 
         btnCreateSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,64 +121,255 @@ public class AddScheduleFragment extends Fragment {
             }
         });
 
+        tvMeetingDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(thisActivity, date, myCalendar.get(Calendar.YEAR), myCalendar
+                        .get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                datePickerDialog.show();
+            }
+        });
+
+        tvMeetingFrom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimePickerDialog("from_time");
+            }
+        });
+        tvMeetingTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimePickerDialog("to_time");
+            }
+        });
+
+        layoutCustomerName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SelectFragment fragment = new SelectFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("select_list", customerList);
+                fragment.setArguments(bundle);
+                fragment.setCancelable(false);
+                fragment.show(getChildFragmentManager(), "SelectSalesFragment");
+
+            }
+        });
+        layoutCustomerLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SelectFragment fragment = new SelectFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("select_list", customerList.get(0).getLocationList());
+                fragment.setArguments(bundle);
+                fragment.setCancelable(false);
+                fragment.show(getChildFragmentManager(), "SelectSalesFragment");
+            }
+        });
+        layoutSalesPerson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reporteesList = (ArrayList<Reportees>) Preferences.sharedInstance().getReporteeResponse().getReportingList();
+                SelectFragment fragment = new SelectFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("select_list", reporteesList);
+                fragment.setArguments(bundle);
+                fragment.setCancelable(false);
+                fragment.show(getChildFragmentManager(), "SelectSalesFragment");
+            }
+        });
+
+    }
+
+    private void getCustomerList() {
+
+        if (mListener != null) {
+            mListener.showLoading();
+        }
+
+        new GetCustomersTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Customer>() {
+            @Override
+            public void onTaskCompleted(List<Customer> list) {
+                customerList = (ArrayList<Customer>) list;
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
+            }
+        }, Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID)).execute();
+
+    }
+
+    private void showTimePickerDialog(final String which) {
+
+        Calendar mCurrentTime = Calendar.getInstance();
+        int hour = mCurrentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = mCurrentTime.get(Calendar.MINUTE);
+        TimePickerDialog mTimePicker;
+        mTimePicker = new TimePickerDialog(thisActivity, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                Calendar datetime = Calendar.getInstance();
+                Calendar c = Calendar.getInstance();
+                datetime.set(Calendar.HOUR_OF_DAY, selectedHour);
+                datetime.set(Calendar.MINUTE, selectedMinute);
+                if (datetime.getTimeInMillis() >= c.getTimeInMillis()) {
+                    String selectedTime = String.format(Locale.US, "%02d:%02d %s", selectedHour == 0 ? 12 : selectedHour,
+                            selectedMinute, selectedHour < 12 ? "am" : "pm");
+                    if (which.equalsIgnoreCase("from_time")) {
+                        tvMeetingFrom.setText(selectedTime);
+                        mMeetingFromTime = selectedTime;
+                        tvMeetingFrom.setAlpha(1f);
+                    } else {
+                        tvMeetingTo.setText(selectedTime);
+                        mMeetingToTime = selectedTime;
+                        tvMeetingTo.setAlpha(1f);
+                    }
+                } else {
+                    //it's before current'
+                    Toast.makeText(thisActivity, "Invalid Time", Toast.LENGTH_LONG).show();
+                }
+            }
+        }, hour, minute, false);
+        mTimePicker.setTitle("Select Time");
+        mTimePicker.show();
+
+    }
+
+    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
+        }
+
+    };
+
+    private void updateLabel() {
+        String myFormat = "dd MMM yyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        tvMeetingDate.setText(sdf.format(myCalendar.getTime()));
+        mMeetingDate = tvMeetingDate.getText().toString();
+        tvMeetingDate.setAlpha(1f);
     }
 
     private void onCreateScheduleClicked() {
-        if (etCustomerName.getText().toString().length() > 0
-                && etDescription.getText().toString().length() > 0
-                && etLocation.getText().toString().length() > 0
-                && etRadiusLimit.getText().toString().length() > 0
-                && etRemarks.getText().toString().length() > 0
-                && selectedSalesPerson.length() > 0) {
 
-            final Meetings schedule = new Meetings();
+        mDesctiption = txtMeetingDescription.getText().toString();
 
-            schedule.setCustomerName(etCustomerName.getText().toString());
-            schedule.setDescription(etDescription.getText().toString());
-            schedule.setLocation(etLocation.getText().toString());
-            schedule.setRadiusLimit(Integer.parseInt(etRadiusLimit.getText().toString()));
-            schedule.setAssignedTo(selectedSalesPerson);
-            schedule.setRemarks(etRemarks.getText().toString());
-            schedule.setStatus("Open");
-
-            new CreateScheduleTask(schedule).execute("");
-        } else {
-            Toast.makeText(thisActivity, "Please enter all details!", Toast.LENGTH_SHORT).show();
+        if (mCustomerName.equalsIgnoreCase("")) {
+            showErrorToast("Please select Customer!");
+            return;
+        } else if (mCustomerLocation.equalsIgnoreCase("")) {
+            showErrorToast("Please select Customer Location!");
+            return;
+        } else if (mSalesName.equalsIgnoreCase("")) {
+            showErrorToast("Please select Sales Person!");
+            return;
+        } else if (mMeetingDate.equalsIgnoreCase("")) {
+            showErrorToast("Please select Date!");
+            return;
+        } else if (mMeetingFromTime.equalsIgnoreCase("")) {
+            showErrorToast("Please select From Time!");
+            return;
+        } else if (mMeetingToTime.equalsIgnoreCase("")) {
+            showErrorToast("Please select To Time!");
+            return;
+        } else if (!mMeetingStatus.equalsIgnoreCase("New Appointment")) {
+            showErrorToast("Meeting status should be New Appointment!");
+            return;
+        } else if (mDesctiption.equalsIgnoreCase("")) {
+            showErrorToast("Please enter description!");
+            return;
         }
+
+        if (mListener != null) {
+            mListener.showLoading();
+        }
+
+        String[] params = {mCustomerID, mSalesID, mCustomerLocationID, mMeetingDate, mMeetingFromTime, mMeetingToTime, mDesctiption};
+        try {
+            new CreateMeetingTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
+                @Override
+                public void onTaskCompleted(List<Meetings> list) {
+
+                    showErrorToast("Meeting created successfully!");
+
+                    if (mListener != null) {
+                        mListener.hideLoading();
+                    }
+
+                    if (getFragmentManager() != null) {
+                        getFragmentManager().popBackStack();
+                    }
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+
+                    if (mListener != null) {
+                        mListener.hideLoading();
+                    }
+                }
+            }, params).execute();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private class CreateScheduleTask extends AsyncTask<String, Void, String> {
+    public void configureStatusSpinner() {
 
-        Meetings schedule;
-
-        private CreateScheduleTask(Meetings schedule) {
-            this.schedule = schedule;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if (mListener != null) {
-                mListener.showLoading();
+        adapter = ArrayAdapter.createFromResource(thisActivity, R.array.status_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMeetingStatus.setAdapter(adapter);
+        spinnerMeetingStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                mMeetingStatus = parentView.getSelectedItem().toString();
+                showErrorToast(mMeetingStatus);
             }
-        }
 
-        @Override
-        protected String doInBackground(String... strings) {
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (mListener != null) {
-                mListener.hideLoading();
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
             }
-            Toast.makeText(thisActivity, "New Scheduled created successfully!", Toast.LENGTH_SHORT).show();
-            getFragmentManager().popBackStack();
-        }
+
+        });
     }
 
+    private void showErrorToast(String message) {
+        Toast.makeText(thisActivity, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemSelected(T data) {
+
+        if (data instanceof Reportees) {
+            mSalesID = ((Reportees) data).getId();
+            mSalesName = ((Reportees) data).getName();
+            tvSalesPerson.setText(mSalesName);
+        } else if (data instanceof Customer) {
+            mCustomerID = ((Customer) data).getId();
+            mCustomerName = ((Customer) data).getName();
+            tvCustomerName.setText(mCustomerName);
+        } else if (data instanceof CustomerLocation) {
+            mCustomerLocationID = ((CustomerLocation) data).getId();
+            mCustomerLocation = ((CustomerLocation) data).getName();
+            tvCustomerLocation.setText(mCustomerLocation);
+        }
+    }
 }
 

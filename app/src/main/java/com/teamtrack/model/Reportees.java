@@ -1,13 +1,12 @@
 package com.teamtrack.model;
 
-import android.arch.persistence.room.Entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.teamtrack.listeners.OnItemSelect;
 
-@Entity
-public class Reportees implements Parcelable {
+public class Reportees implements Parcelable, OnItemSelect {
 
     @SerializedName("employee_id")
     private String empId;
@@ -152,5 +151,15 @@ public class Reportees implements Parcelable {
 
     public void setLastUpdatedLocation(String lastUpdatedLocation) {
         this.lastUpdatedLocation = lastUpdatedLocation;
+    }
+
+    @Override
+    public String getName() {
+        return empName;
+    }
+
+    @Override
+    public String getId() {
+        return empId;
     }
 }

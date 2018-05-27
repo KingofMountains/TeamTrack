@@ -15,10 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.teamtrack.R;
-import com.teamtrack.database.tables.Meetings;
+import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.tasks.GetSchedulesTask;
+import com.teamtrack.model.Meetings;
+import com.teamtrack.tasks.GetMeetingsTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,10 @@ public class SalesFragment extends Fragment {
     View view;
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
-    List<Meetings> scheduleList = new ArrayList<>();
+    ArrayList<Meetings> scheduleList = new ArrayList<>();
     TabLayout tabLayout;
     ViewPager viewPager;
+    private String referenceID = "";
 
     public SalesFragment() {
         // Required empty public constructor
@@ -42,7 +44,7 @@ public class SalesFragment extends Fragment {
     public static SalesFragment newInstance(String refID) {
         SalesFragment fragment = new SalesFragment();
         Bundle args = new Bundle();
-        args.putString("ref_id", refID);
+        args.putString("reference_id", refID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,6 +62,7 @@ public class SalesFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         thisActivity = getActivity();
+        init();
     }
 
     @Override
@@ -75,31 +78,43 @@ public class SalesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        init();
     }
 
     private void init() {
+
+        Bundle extras = getArguments();
+
+        referenceID = Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID);
+
+        if (extras != null) {
+            if (extras.containsKey("reference_id")) {
+                referenceID = extras.getString("reference_id");
+            }
+        }
         tabLayout = view.findViewById(R.id.tab_layout_sales);
         viewPager = view.findViewById(R.id.view_pager_sales);
+
+        viewPager.setAdapter(new TaskPagerAdapter(getChildFragmentManager(), 3));
+        tabLayout.setupWithViewPager(viewPager);
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setCurrentItem(1);
+
         getMeetings();
     }
 
     private void getMeetings() {
-        new GetSchedulesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
+
+        new GetMeetingsTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
             @Override
             public void onTaskCompleted(List<Meetings> list) {
-                scheduleList = list;
-                viewPager.setAdapter(new TaskPagerAdapter(getChildFragmentManager(), 3));
-                tabLayout.setupWithViewPager(viewPager);
-                viewPager.setOffscreenPageLimit(3);
-                viewPager.setCurrentItem(1);
+                scheduleList = (ArrayList<Meetings>) list;
             }
 
             @Override
             public void onError(String errorMessage) {
 
             }
-        }).execute("");
+        }, referenceID).execute();
     }
 
     private class TaskPagerAdapter extends FragmentPagerAdapter {

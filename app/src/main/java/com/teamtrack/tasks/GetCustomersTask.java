@@ -9,20 +9,19 @@ import com.android.volley.VolleyError;
 import com.network.VolleySingleton;
 import com.network.requests.GSONRequest;
 import com.teamtrack.BuildConfig;
-import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.model.Reportees;
-import com.teamtrack.model.response.ReporteeListResponse;
+import com.teamtrack.model.Customer;
+import com.teamtrack.model.response.CustomerListResponse;
 
 import java.lang.ref.WeakReference;
 
-public class GetReporteesTask {
+public class GetCustomersTask {
 
     private WeakReference<Context> context;
-    private OnTaskCompletionListener<Reportees> listener;
+    private OnTaskCompletionListener<Customer> listener;
     private String refID;
 
-    public GetReporteesTask(Context context, OnTaskCompletionListener<Reportees> listener, String refID) {
+    public GetCustomersTask(Context context, OnTaskCompletionListener<Customer> listener, String refID) {
         this.context = new WeakReference<>(context);
         this.listener = listener;
         this.refID = refID;
@@ -30,18 +29,17 @@ public class GetReporteesTask {
 
     public void execute() {
 
-        String url = BuildConfig.SERVER_URL + BuildConfig.REPORTEE_LIST_OTP_URL + "refid=" + refID;
+        String url = BuildConfig.SERVER_URL + BuildConfig.CUSTOMER_LIST_OTP_URL + "refid=" + refID;
 
-        GSONRequest request = new GSONRequest(Request.Method.GET, url, ReporteeListResponse.class, null,
-                new Response.Listener<ReporteeListResponse>() {
+        GSONRequest request = new GSONRequest(Request.Method.GET, url, CustomerListResponse.class, null,
+                new Response.Listener<CustomerListResponse>() {
                     @Override
-                    public void onResponse(ReporteeListResponse response) {
-                        Log.d("onResponse :", response.getReportingList().toString());
+                    public void onResponse(CustomerListResponse response) {
+                        Log.d("onResponse :", response.toString());
 
-                        if (response.getReportingList() != null) {
+                        if (response.getCustomerList() != null) {
                             if (listener != null) {
-                                listener.onTaskCompleted(response.getReportingList());
-                                Preferences.sharedInstance().put(Preferences.Key.REPORTEE_LIST, response);
+                                listener.onTaskCompleted(response.getCustomerList());
                             }
                         }
                     }

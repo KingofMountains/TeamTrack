@@ -8,8 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.teamtrack.R;
-import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnItemSelectedListener;
+import com.teamtrack.model.Meetings;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
         if (from.equalsIgnoreCase("SALES")) {
             holder.visibleAdminView(View.GONE);
         } else {
-            if (data.getStatus().equalsIgnoreCase("Completed")) {
+            if (data.getMeetingStatus().equalsIgnoreCase("Completed")) {
                 holder.visibleAdminView(View.VISIBLE);
             }
         }
@@ -79,18 +79,18 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
         public void setValues(Meetings data) {
             tvCustomerName.setText(data.getCustomerName());
             tvDescription.setText(data.getDescription());
-            tvLocation.setText(data.getLocation());
+            tvLocation.setText(data.getCustomerLocationName());
 
             if (from.equalsIgnoreCase("SALES")) {
-                if (data.getStatus().equalsIgnoreCase("Completed")) {
+                if (data.getMeetingStatus().equalsIgnoreCase("Completed")) {
                     lnrAppointment.setEnabled(false);
                     lnrAppointment.setClickable(false);
                     lnrAppointment.setAlpha(0.5f);
                 }
             } else {
-                tvRemarks.setText(data.getRemarks());
-                tvSalesLocation.setText(data.getSales_location());
-                tvSalesTime.setText(data.getSales_location_time());
+                tvRemarks.setText(data.getMeetingUpdates());
+                tvSalesLocation.setText(data.getStatusUpdatedFrom());
+                tvSalesTime.setText(data.getStatusUpdatedOn());
                 tvRemarks.setAlpha(0.5f);
                 tvSalesLocation.setAlpha(0.5f);
                 tvSalesTime.setAlpha(0.5f);

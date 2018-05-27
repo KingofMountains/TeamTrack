@@ -14,9 +14,9 @@ import android.view.ViewGroup;
 
 import com.teamtrack.R;
 import com.teamtrack.adapters.MeetingsAdapter;
-import com.teamtrack.database.tables.Meetings;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnItemSelectedListener;
+import com.teamtrack.model.Meetings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
-            view = inflater.inflate(R.layout.fragment_home_sales, container, false);
+            view = inflater.inflate(R.layout.fragment_schedules_sales, container, false);
         }
         return view;
     }

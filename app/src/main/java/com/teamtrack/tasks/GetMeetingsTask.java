@@ -9,20 +9,19 @@ import com.android.volley.VolleyError;
 import com.network.VolleySingleton;
 import com.network.requests.GSONRequest;
 import com.teamtrack.BuildConfig;
-import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.model.Reportees;
-import com.teamtrack.model.response.ReporteeListResponse;
+import com.teamtrack.model.Meetings;
+import com.teamtrack.model.response.MeetingListResponse;
 
 import java.lang.ref.WeakReference;
 
-public class GetReporteesTask {
+public class GetMeetingsTask {
 
     private WeakReference<Context> context;
-    private OnTaskCompletionListener<Reportees> listener;
+    private OnTaskCompletionListener<Meetings> listener;
     private String refID;
 
-    public GetReporteesTask(Context context, OnTaskCompletionListener<Reportees> listener, String refID) {
+    public GetMeetingsTask(Context context, OnTaskCompletionListener<Meetings> listener, String refID) {
         this.context = new WeakReference<>(context);
         this.listener = listener;
         this.refID = refID;
@@ -30,18 +29,17 @@ public class GetReporteesTask {
 
     public void execute() {
 
-        String url = BuildConfig.SERVER_URL + BuildConfig.REPORTEE_LIST_OTP_URL + "refid=" + refID;
+        String url = BuildConfig.SERVER_URL + BuildConfig.MEETING_LIST_URL + "refid=" + refID;
 
-        GSONRequest request = new GSONRequest(Request.Method.GET, url, ReporteeListResponse.class, null,
-                new Response.Listener<ReporteeListResponse>() {
+        GSONRequest request = new GSONRequest(Request.Method.GET, url, MeetingListResponse.class, null,
+                new Response.Listener<MeetingListResponse>() {
                     @Override
-                    public void onResponse(ReporteeListResponse response) {
-                        Log.d("onResponse :", response.getReportingList().toString());
+                    public void onResponse(MeetingListResponse response) {
+                        Log.d("onResponse :", response.getMeetingsList().toString());
 
-                        if (response.getReportingList() != null) {
+                        if (response.getMeetingsList() != null) {
                             if (listener != null) {
-                                listener.onTaskCompleted(response.getReportingList());
-                                Preferences.sharedInstance().put(Preferences.Key.REPORTEE_LIST, response);
+                                listener.onTaskCompleted(response.getMeetingsList());
                             }
                         }
                     }

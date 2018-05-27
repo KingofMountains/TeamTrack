@@ -3,18 +3,23 @@ package com.teamtrack.Utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class Preferences {
+import com.google.gson.Gson;
+import com.teamtrack.model.response.ReporteeListResponse;
+
+public class Preferences<T> {
 
     private static final String SETTINGS_NAME = "default_settings";
     private SharedPreferences sharedPreferences;
     private static Preferences mPreference;
     private SharedPreferences.Editor mEditor;
+    private static Gson gson;
 
     public enum Key {
         EMPLOYEE_NAME,
         EMPLOYEE_ID,
         EMPLOYEE_TYPE,
         EMPLOYEE_REF_ID,
+        REPORTEE_LIST
     }
 
     private Preferences(Context context) {
@@ -24,6 +29,7 @@ public class Preferences {
     public static Preferences sharedInstance(Context context) {
         if (mPreference == null) {
             mPreference = new Preferences(context);
+            gson = new Gson();
         }
         return mPreference;
     }
@@ -72,7 +78,18 @@ public class Preferences {
         commit();
     }
 
+    public <T> void put(Key key, T response) {
+        edit();
+        String json = gson.toJson(response);
+        mEditor.putString(key.name(), json);
+        commit();
+    }
+
     public String getString(Key key) {
         return sharedPreferences.getString(key.name(), null);
+    }
+
+    public ReporteeListResponse getReporteeResponse() {
+        return gson.fromJson(getString(Key.REPORTEE_LIST),ReporteeListResponse.class);
     }
 }
