@@ -34,9 +34,11 @@ import com.teamtrack.model.Reportees;
 import com.teamtrack.tasks.CreateMeetingTask;
 import com.teamtrack.tasks.GetCustomersTask;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,6 +61,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
     RelativeLayout layoutCustomerName, layoutCustomerLocation, layoutSalesPerson;
     ArrayList<Reportees> reporteesList;
     ArrayList<Customer> customerList;
+    private boolean todaySelected = false;
 
     public AddScheduleFragment() {
         // Required empty public constructor
@@ -221,9 +224,10 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
                 Calendar c = Calendar.getInstance();
                 datetime.set(Calendar.HOUR_OF_DAY, selectedHour);
                 datetime.set(Calendar.MINUTE, selectedMinute);
-                if (datetime.getTimeInMillis() >= c.getTimeInMillis()) {
+                if (datetime.getTimeInMillis() >= c.getTimeInMillis() || !todaySelected) {
+                    selectedHour %= 12;
                     String selectedTime = String.format(Locale.US, "%02d:%02d %s", selectedHour == 0 ? 12 : selectedHour,
-                            selectedMinute, selectedHour < 12 ? "am" : "pm");
+                            selectedMinute, selectedHour < 12 ? "AM" : "PM");
                     if (which.equalsIgnoreCase("from_time")) {
                         tvMeetingFrom.setText(selectedTime);
                         mMeetingFromTime = selectedTime;
@@ -234,8 +238,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
                         tvMeetingTo.setAlpha(1f);
                     }
                 } else {
-                    //it's before current'
-                    Toast.makeText(thisActivity, "Invalid Time", Toast.LENGTH_LONG).show();
+                    showErrorToast("Invalid time. Cannot select past time as date selected is today.");
                 }
             }
         }, hour, minute, false);
@@ -263,6 +266,13 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         tvMeetingDate.setText(sdf.format(myCalendar.getTime()));
         mMeetingDate = tvMeetingDate.getText().toString();
         tvMeetingDate.setAlpha(1f);
+        try {
+            Date selectedDate = sdf.parse(mMeetingDate);
+            Date currentDate = sdf.parse(sdf.format(Calendar.getInstance().getTime()));
+            todaySelected = currentDate.equals(selectedDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     private void onCreateScheduleClicked() {
@@ -339,7 +349,6 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 mMeetingStatus = parentView.getSelectedItem().toString();
-                showErrorToast(mMeetingStatus);
             }
 
             @Override
@@ -351,7 +360,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
     }
 
     private void showErrorToast(String message) {
-        Toast.makeText(thisActivity, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(thisActivity, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

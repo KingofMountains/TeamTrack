@@ -13,23 +13,23 @@ public class Meetings implements Parcelable {
 
     @SerializedName("meeting_id")
     private String meetingID;
+    @SerializedName("employee_id")
+    private String employeeId;
     @SerializedName("customer_id")
     private String customerID;
     @SerializedName("customer_name")
     private String customerName;
-    @SerializedName("customer_location_id")
-    private String customerLocationID;
     @SerializedName("location_name")
     private String customerLocationName;
-    @SerializedName("employee_id")
-    private String employeeId;
+    @SerializedName("customer_location_id")
+    private String customerLocationID;
     @SerializedName("schedule_date")
     private String scheduledDate;
     @SerializedName("meeting_from")
     private String meetingFromTime;
     @SerializedName("meeting_to")
     private String meetingToTime;
-    @SerializedName("meeting_status")
+    @SerializedName("status")
     private String meetingStatus;
     @SerializedName("description")
     private String description;
@@ -40,13 +40,14 @@ public class Meetings implements Parcelable {
     @SerializedName("meeting_updates")
     private String meetingUpdates;
 
+
     protected Meetings(Parcel in) {
         meetingID = in.readString();
+        employeeId = in.readString();
         customerID = in.readString();
         customerName = in.readString();
-        customerLocationID = in.readString();
         customerLocationName = in.readString();
-        employeeId = in.readString();
+        customerLocationID = in.readString();
         scheduledDate = in.readString();
         meetingFromTime = in.readString();
         meetingToTime = in.readString();
@@ -77,11 +78,11 @@ public class Meetings implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(meetingID);
+        parcel.writeString(employeeId);
         parcel.writeString(customerID);
         parcel.writeString(customerName);
-        parcel.writeString(customerLocationID);
         parcel.writeString(customerLocationName);
-        parcel.writeString(employeeId);
+        parcel.writeString(customerLocationID);
         parcel.writeString(scheduledDate);
         parcel.writeString(meetingFromTime);
         parcel.writeString(meetingToTime);
@@ -100,6 +101,14 @@ public class Meetings implements Parcelable {
         this.meetingID = meetingID;
     }
 
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
     public String getCustomerID() {
         return customerID;
     }
@@ -116,14 +125,6 @@ public class Meetings implements Parcelable {
         this.customerName = customerName;
     }
 
-    public String getCustomerLocationID() {
-        return customerLocationID;
-    }
-
-    public void setCustomerLocationID(String customerLocationID) {
-        this.customerLocationID = customerLocationID;
-    }
-
     public String getCustomerLocationName() {
         return customerLocationName;
     }
@@ -132,12 +133,12 @@ public class Meetings implements Parcelable {
         this.customerLocationName = customerLocationName;
     }
 
-    public String getEmployeeId() {
-        return employeeId;
+    public String getCustomerLocationID() {
+        return customerLocationID;
     }
 
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
+    public void setCustomerLocationID(String customerLocationID) {
+        this.customerLocationID = customerLocationID;
     }
 
     public String getScheduledDate() {

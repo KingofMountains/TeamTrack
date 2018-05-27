@@ -1,5 +1,6 @@
 package com.teamtrack.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +34,7 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
     private Reportees data;
     private TextView tvEmployeeName, tvLastUpdated;
     private double latitude, longitude;
+    OnFragmentInteractionListener mListener;
 
     public LocateTeamFragment() {
         // Required empty public constructor
@@ -64,7 +66,23 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
         init();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+
     private void init() {
+
+        if (mListener != null) {
+            mListener.hideSideMenu(true);
+        }
+
 
         tvEmployeeName = view.findViewById(R.id.tv_location_team_employee_name);
         tvLastUpdated = view.findViewById(R.id.tv_location_team_employee_last_known_time);

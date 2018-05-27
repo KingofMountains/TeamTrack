@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     ProgressDialog dialog;
     private DrawerLayout drawerLayout;
     LocationManager locationManager;
+    Menu menu;
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +47,14 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         toolbar.setTitle("Team Track");
         setSupportActionBar(toolbar);
 
+//        // add back arrow to toolbar
+//        if (getSupportActionBar() != null) {
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//            getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        }
+
         drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -149,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             }
         } else {
             loadSalesFragment(Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID));
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
 
@@ -164,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
+        this.menu = menu;
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -188,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     public void onFragmentInteraction(String action, String... args) {
         switch (action) {
             case "ADD_SCHEDULE":
+                navigationView.getMenu().getItem(1).setChecked(true);
                 loadAddScheduleFragment();
                 break;
             case "SALES":
@@ -206,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 break;
             case "LOCATE_ME":
                 loadLocateTeamFragment(bundle);
+                break;
+            case "SCHEDULE_LIST_SELECT":
+                loadScheduleDetailsFragment(bundle);
                 break;
             default:
                 break;
@@ -226,12 +238,26 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         }
     }
 
+    @Override
+    public void hideSideMenu(boolean status) {
+        if (status) {
+            if (menu != null) {
+                menu.findItem(R.id.action_menu).setVisible(false);
+            }
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        } else {
+            if (menu != null) {
+                menu.findItem(R.id.action_menu).setVisible(true);
+            }
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        }
+    }
+
     private void loadAddScheduleFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
                 .replace(R.id.fragment_container, AddScheduleFragment.newInstance(), "AddScheduleFragment")
-                .addToBackStack("AddScheduleFragment")
                 .commit();
     }
 
@@ -255,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             getSupportFragmentManager()
                     .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                    .add(R.id.fragment_container, SalesFragment.newInstance(refID), "SalesFragment")
+                    .replace(R.id.fragment_container, SalesFragment.newInstance(refID), "SalesFragment")
                     .addToBackStack("SalesFragment")
                     .commit();
         } else {

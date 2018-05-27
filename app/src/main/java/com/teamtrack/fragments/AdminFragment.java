@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -67,6 +68,12 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -77,6 +84,10 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
     }
 
     private void init() {
+
+        if (mListener != null) {
+            mListener.hideSideMenu(false);
+        }
 
         tvTitle = view.findViewById(R.id.tv_title);
         floatButtonAddSchedule = view.findViewById(R.id.float_btn_add_schedule);
@@ -145,7 +156,7 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
         if (mListener != null) {
             if (action.equalsIgnoreCase("HOME")) {
                 //TODO change to emp code
-                mListener.onFragmentInteraction("SALES", reporteesList.get(position).getReferenceID());
+                mListener.onFragmentInteraction("SALES", reporteesList.get(position).getEmpCode());
             } else {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("selected_item", reporteesList.get(position));

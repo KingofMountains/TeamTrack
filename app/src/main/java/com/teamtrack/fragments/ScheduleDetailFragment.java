@@ -17,8 +17,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,13 +45,14 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
     View view;
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
-    TextView tvCustomerName, tvDescription, tvLocation, tvStatus;
+    TextView tvCustomerName, tvDescription, tvLocation;
     EditText etRemarks;
     Button btnCheckIn;
-    String streetAddress;
     Meetings data;
-    int radiusLimit = 0;
+    ArrayAdapter adapter;
+    Spinner spinnerMeetingStatus;
     private FusedLocationProviderClient mFusedLocationClient;
+    private String mMeetingStatus = "";
 
 
     public ScheduleDetailFragment() {
@@ -61,7 +65,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_schedule_details, container, false);
         }
@@ -89,12 +93,18 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
 
         Bundle extras = getArguments();
 
+        if (mListener != null) {
+            mListener.hideSideMenu(true);
+        }
+
         tvCustomerName = view.findViewById(R.id.tv_customer_name);
         tvLocation = view.findViewById(R.id.tv_location);
         tvDescription = view.findViewById(R.id.tv_description);
         etRemarks = view.findViewById(R.id.tv_remarks);
-        tvStatus = view.findViewById(R.id.tv_status);
+        spinnerMeetingStatus = view.findViewById(R.id.spinner_status);
         btnCheckIn = view.findViewById(R.id.btn_check_in);
+
+        configureStatusSpinner();
 
         btnCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,14 +117,29 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
             data = extras.getParcelable("selected_item");
             if (data != null) {
                 tvCustomerName.setText(data.getCustomerName());
-//                tvLocation.setText(data.getLocation());
-//                tvDescription.setText(data.getDescription());
-//                etRemarks.setText(data.getRemarks());
-//                tvStatus.setText(data.getStatus());
-//                streetAddress = data.getLocation();
-//                radiusLimit = data.getRadiusLimit();
+                tvLocation.setText(data.getCustomerLocationName());
+                tvDescription.setText(data.getDescription());
             }
         }
+    }
+
+    public void configureStatusSpinner() {
+
+        adapter = ArrayAdapter.createFromResource(thisActivity, R.array.status_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMeetingStatus.setAdapter(adapter);
+        spinnerMeetingStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                mMeetingStatus = "" + position + 1;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
     }
 
     private void fetchCurrentLocation() {
@@ -148,29 +173,6 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                         .show();
             }
         });
-    }
-
-    /**
-     * calculates the distance between two locations in MILES(meters)
-     */
-    private double distance(double lat1, double lng1, double lat2, double lng2) {
-
-        double earthRadius = 3958.75; // in miles, change to 6371 for kilometers
-
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLng = Math.toRadians(lng2 - lng1);
-
-        double sindLat = Math.sin(dLat / 2);
-        double sindLng = Math.sin(dLng / 2);
-
-        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
-                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        double dist = earthRadius * c;
-
-        return dist * 1609.344; // converting miles into meters.
     }
 
     @Override

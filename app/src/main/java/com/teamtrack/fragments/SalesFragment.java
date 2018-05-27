@@ -29,6 +29,7 @@ import java.util.List;
  */
 public class SalesFragment extends Fragment {
 
+    private static final int NUMBER_OF_TABS = 3;
     View view;
     OnFragmentInteractionListener mListener;
     Activity thisActivity;
@@ -36,6 +37,7 @@ public class SalesFragment extends Fragment {
     TabLayout tabLayout;
     ViewPager viewPager;
     private String referenceID = "";
+    MeetingsViewPagerAdapter adapter;
 
     public SalesFragment() {
         // Required empty public constructor
@@ -84,6 +86,10 @@ public class SalesFragment extends Fragment {
 
         Bundle extras = getArguments();
 
+        if (mListener != null) {
+            mListener.hideSideMenu(true);
+        }
+
         referenceID = Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID);
 
         if (extras != null) {
@@ -94,40 +100,55 @@ public class SalesFragment extends Fragment {
         tabLayout = view.findViewById(R.id.tab_layout_sales);
         viewPager = view.findViewById(R.id.view_pager_sales);
 
-        viewPager.setAdapter(new TaskPagerAdapter(getChildFragmentManager(), 3));
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.setOffscreenPageLimit(3);
-        viewPager.setCurrentItem(1);
-
         getMeetings();
     }
 
     private void getMeetings() {
 
+        if (mListener != null) {
+            mListener.showLoading();
+        }
+
+
         new GetMeetingsTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
             @Override
             public void onTaskCompleted(List<Meetings> list) {
                 scheduleList = (ArrayList<Meetings>) list;
+
+                adapter = new MeetingsViewPagerAdapter(getChildFragmentManager(), NUMBER_OF_TABS);
+                viewPager.setAdapter(adapter);
+                tabLayout.setupWithViewPager(viewPager);
+                viewPager.setOffscreenPageLimit(3);
+                viewPager.setCurrentItem(1);
+
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
+
             }
 
             @Override
             public void onError(String errorMessage) {
 
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
+
             }
         }, referenceID).execute();
     }
 
-    private class TaskPagerAdapter extends FragmentPagerAdapter {
+    private class MeetingsViewPagerAdapter extends FragmentPagerAdapter {
         int mNumOfTabs;
 
-        TaskPagerAdapter(FragmentManager fm, int NumOfTabs) {
+        MeetingsViewPagerAdapter(FragmentManager fm, int NumOfTabs) {
             super(fm);
             this.mNumOfTabs = NumOfTabs;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return SalesMeetingsFragment.newInstance(position, (ArrayList<Meetings>) scheduleList);
+            return SalesMeetingsFragment.newInstance(position, scheduleList);
         }
 
         @Override
@@ -147,6 +168,10 @@ public class SalesFragment extends Fragment {
         @Override
         public int getCount() {
             return mNumOfTabs;
+        }
+
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
     }
 

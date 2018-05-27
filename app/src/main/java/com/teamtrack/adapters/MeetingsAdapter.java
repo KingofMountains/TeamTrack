@@ -17,12 +17,10 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
 
     private List<Meetings> scheduleList;
     private OnItemSelectedListener listener;
-    private String from;
 
-    public MeetingsAdapter(List<Meetings> scheduleList, OnItemSelectedListener listener, String from) {
+    public MeetingsAdapter(List<Meetings> scheduleList, OnItemSelectedListener listener) {
         this.scheduleList = scheduleList;
         this.listener = listener;
-        this.from = from;
     }
 
 
@@ -36,13 +34,6 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
 
         final Meetings data = scheduleList.get(holder.getAdapterPosition());
 
-        if (from.equalsIgnoreCase("SALES")) {
-            holder.visibleAdminView(View.GONE);
-        } else {
-            if (data.getMeetingStatus().equalsIgnoreCase("Completed")) {
-                holder.visibleAdminView(View.VISIBLE);
-            }
-        }
         holder.setValues(data);
 
         holder.lnrAppointment.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +52,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvCustomerName, tvDescription, tvLocation, tvRemarks, tvSalesLocation, tvSalesTime;
+        TextView tvCustomerName, tvDescription, tvLocation, tvDate;
         LinearLayout lnrAppointment;
 
         public ViewHolder(View itemView) {
@@ -69,9 +60,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
             tvCustomerName = itemView.findViewById(R.id.tv_customer_name);
             tvDescription = itemView.findViewById(R.id.tv_description);
             tvLocation = itemView.findViewById(R.id.tv_location);
-            tvRemarks = itemView.findViewById(R.id.tv_remarks);
-            tvSalesLocation = itemView.findViewById(R.id.tv_location_sales);
-            tvSalesTime = itemView.findViewById(R.id.tv_location_sales_time);
+            tvDate = itemView.findViewById(R.id.tv_date);
             lnrAppointment = itemView.findViewById(R.id.lnr_schedule_list);
         }
 
@@ -80,28 +69,7 @@ public class MeetingsAdapter extends RecyclerView.Adapter<MeetingsAdapter.ViewHo
             tvCustomerName.setText(data.getCustomerName());
             tvDescription.setText(data.getDescription());
             tvLocation.setText(data.getCustomerLocationName());
-
-            if (from.equalsIgnoreCase("SALES")) {
-                if (data.getMeetingStatus().equalsIgnoreCase("Completed")) {
-                    lnrAppointment.setEnabled(false);
-                    lnrAppointment.setClickable(false);
-                    lnrAppointment.setAlpha(0.5f);
-                }
-            } else {
-                tvRemarks.setText(data.getMeetingUpdates());
-                tvSalesLocation.setText(data.getStatusUpdatedFrom());
-                tvSalesTime.setText(data.getStatusUpdatedOn());
-                tvRemarks.setAlpha(0.5f);
-                tvSalesLocation.setAlpha(0.5f);
-                tvSalesTime.setAlpha(0.5f);
-            }
-
-        }
-
-        private void visibleAdminView(int visibility) {
-            tvRemarks.setVisibility(visibility);
-            tvSalesTime.setVisibility(visibility);
-            tvSalesLocation.setVisibility(visibility);
+            tvDate.setText(data.getScheduledDate());
         }
     }
 }

@@ -78,6 +78,11 @@ public class SplashActivity extends AppCompatActivity implements OnFragmentInter
         dialog.dismiss();
     }
 
+    @Override
+    public void hideSideMenu(boolean status) {
+
+    }
+
     private void loadMainActivity(String userType) {
         startActivity(new Intent(SplashActivity.this, MainActivity.class).putExtra("user_type", userType));
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

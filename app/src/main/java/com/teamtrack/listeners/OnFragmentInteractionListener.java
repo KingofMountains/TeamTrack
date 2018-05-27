@@ -7,4 +7,5 @@ public interface OnFragmentInteractionListener {
         void onFragmentInteraction(String from, Bundle bundle);
         void showLoading();
         void hideLoading();
+        void hideSideMenu(boolean status);
 }
