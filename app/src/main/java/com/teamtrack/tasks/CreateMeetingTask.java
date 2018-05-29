@@ -37,6 +37,10 @@ public class CreateMeetingTask {
 
         mParams = mParams.replace(" ", "%20");
 
+        if (params.length == 8 && !params[7].equalsIgnoreCase("")) {
+            mParams = mParams + "&meeting_id=" + params[7];
+        }
+
         String url = BuildConfig.SERVER_URL + BuildConfig.CREATE_MEETING_URL + mParams;
 
         GSONRequest request = new GSONRequest(Request.Method.GET, url, Meetings.class, null,

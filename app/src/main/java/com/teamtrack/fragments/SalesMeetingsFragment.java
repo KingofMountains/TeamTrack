@@ -128,6 +128,9 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
 
         for (Meetings meeting : meeting_list) {
             if (validateMeeting(meeting, type) != null) {
+                if (type == 0) {
+                    meeting.setMeetingStatus("Meeting Completed");
+                }
                 currentList.add(meeting);
             }
         }
@@ -161,15 +164,16 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
     @Override
     public void onItemSelected(int position, String action) {
 
-        if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
-            if (mListener != null) {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("selected_item", meetingsList.get(position));
+        if (mListener != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("selected_item", meetingsList.get(position));
+            if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")
+                    && !meetingsList.get(position).getMeetingStatus().equalsIgnoreCase("Meeting Completed")) {
                 mListener.onFragmentInteraction("SCHEDULE_LIST_SELECT", bundle);
+            } else {
+                mListener.onFragmentInteraction("UPDATE_MEETING", bundle);
             }
         }
     }
-
-
 }
 

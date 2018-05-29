@@ -34,7 +34,7 @@
                     android:id="@+id/tv_customer_name"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_margin="8dp"
+                    android:layout_centerInParent="true"
                     android:layout_toLeftOf="@+id/iv_customer"
                     android:layout_toStartOf="@+id/iv_customer"
                     android:background="@null"
@@ -51,6 +51,10 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_centerInParent="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0.5"
                     android:src="@drawable/ic_right_chevron"/>
 
                 <View
@@ -64,13 +68,13 @@
                 android:id="@+id/relative_customer_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="4dp">
 
                 <TextView
                     android:id="@+id/tv_customer_location"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_margin="8dp"
+                    android:layout_centerInParent="true"
                     android:layout_toLeftOf="@+id/iv_customer_location"
                     android:layout_toStartOf="@+id/iv_customer_location"
                     android:background="@null"
@@ -87,6 +91,10 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_centerInParent="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0.5"
                     android:src="@drawable/ic_right_chevron"/>
 
                 <View
@@ -100,13 +108,13 @@
                 android:id="@+id/relative_sales_person"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="4dp">
 
                 <TextView
                     android:id="@+id/tv_sales_person"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
-                    android:layout_margin="8dp"
+                    android:layout_centerInParent="true"
                     android:layout_toLeftOf="@+id/iv_sales_person"
                     android:layout_toStartOf="@+id/iv_sales_person"
                     android:background="@null"
@@ -123,6 +131,10 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_centerInParent="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0.5"
                     android:src="@drawable/ic_right_chevron"/>
 
                 <View
@@ -152,10 +164,10 @@
                     android:layout_height="35dp"
                     android:layout_below="@+id/tv_date"
                     android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:text="DD MMM YYYY"
                     android:alpha="0.5"
+                    android:gravity="center_vertical"
                     android:maxLines="1"
+                    android:text="DD MMM YYYY"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"/>
 
@@ -192,12 +204,12 @@
                         android:layout_height="35dp"
                         android:layout_below="@+id/tv_from_time"
                         android:layout_marginTop="4dp"
+                        android:alpha="0.5"
                         android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:alpha="0.5"
+                        android:text="HH:MM AM"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        android:text="HH:MM AM"/>
+                        android:textSize="14sp"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -226,12 +238,12 @@
                         android:layout_height="35dp"
                         android:layout_below="@+id/tv_to_time"
                         android:layout_marginTop="4dp"
+                        android:alpha="0.5"
                         android:gravity="center_vertical"
                         android:maxLines="1"
+                        android:text="HH:MM AM"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp"
-                        android:alpha="0.5"
-                        android:text="HH:MM AM"/>
+                        android:textSize="14sp"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -267,9 +279,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@drawable/curved_border_grey"
-                        android:gravity="center_vertical"
                         android:drawSelectorOnTop="true"
                         android:entries="@array/status_array"
+                        android:gravity="center_vertical"
                         tools:listitem="@android:layout/simple_spinner_item"/>
 
                     <ImageView
@@ -277,91 +289,14 @@
                         android:layout_height="24dp"
                         android:layout_gravity="end|center_vertical"
                         android:layout_margin="3dp"
+                        android:alpha="0.5"
                         android:src="@drawable/spinner_down"
-                        android:tint="@color/colorPrimaryDark"/>
-
+                        android:tint="@color/secondary_text"/>
 
 
                 </FrameLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.5dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/primaryLightColor"/>
             </RelativeLayout>
-
-            <!--
-                        <RelativeLayout
-                            android:id="@+id/relative_status_from"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
-
-                            <TextView
-                                android:id="@+id/tv_status_from"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Status Updated From"
-                                android:textSize="12sp"/>
-
-                            <EditText
-                                android:id="@+id/et_status_from"
-                                android:layout_width="match_parent"
-                                android:layout_height="35dp"
-                                android:layout_below="@+id/tv_status_from"
-                                android:layout_marginTop="4dp"
-                                android:background="@null"
-                                android:gravity="center_vertical"
-                                android:inputType="date"
-                                android:maxLines="1"
-                                android:textColor="@android:color/black"
-                                android:textSize="14sp"
-                                tools:text="Hopes college, Coimbatore"/>
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="0.5dp"
-                                android:layout_alignParentBottom="true"
-                                android:background="@color/primaryLightColor"/>
-                        </RelativeLayout>
-
-                        <RelativeLayout
-                            android:id="@+id/relative_status_on"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
-
-                            <TextView
-                                android:id="@+id/tv_status_on"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Status Updated From"
-                                android:textSize="12sp"/>
-
-                            <EditText
-                                android:id="@+id/et_status_on"
-                                android:layout_width="match_parent"
-                                android:layout_height="35dp"
-                                android:layout_below="@+id/tv_status_on"
-                                android:layout_marginTop="4dp"
-                                android:background="@null"
-                                android:gravity="center_vertical"
-                                android:inputType="date"
-                                android:maxLines="1"
-                                android:textColor="@android:color/black"
-                                android:textSize="14sp"
-                                tools:text="25 May 2018 04:30PM"/>
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="0.5dp"
-                                android:layout_alignParentBottom="true"
-                                android:background="@color/primaryLightColor"/>
-                        </RelativeLayout>
-            -->
 
             <RelativeLayout
                 android:id="@+id/relative_description"
@@ -385,11 +320,41 @@
                     android:layout_marginTop="4dp"
                     android:background="@drawable/curved_border_grey"
                     android:gravity="start"
-                    android:inputType="textMultiLine"
-                    android:maxLength="255"
+                    android:maxLength="120"
+                    android:imeOptions="actionNext"
                     android:padding="8dp"
                     android:textSize="14sp"
                     tools:text="TV Installation"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_status_from"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_status_from"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Status Updated From"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/et_status_from"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_below="@+id/tv_status_from"
+                    android:layout_marginTop="4dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="Hopes college, Coimbatore"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -397,6 +362,77 @@
                     android:layout_alignParentBottom="true"
                     android:background="@color/primaryLightColor"/>
             </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_status_on"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_status_on"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Status Updated On"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/et_status_on"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_below="@+id/tv_status_on"
+                    android:layout_marginTop="4dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="25 May 2018 04:30PM"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/relative_meeting_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_meeting_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Meeting Updates"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/et_meeting_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_meeting_update"
+                    android:layout_marginTop="4dp"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:padding="8dp"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    tools:text="Met the client, updated the status. Needs re-visit"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/primaryLightColor"/>
+            </RelativeLayout>
+
 
             <Button
                 android:id="@+id/btn_create_schedule"

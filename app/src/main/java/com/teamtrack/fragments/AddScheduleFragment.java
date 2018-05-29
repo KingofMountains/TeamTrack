@@ -53,15 +53,20 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
     Button btnCreateSchedule;
     Calendar myCalendar;
     String mCustomerID = "", mCustomerName = "", mCustomerLocationID = "", mCustomerLocation = "", mSalesID = "", mSalesName = "",
-            mMeetingDate = "", mMeetingFromTime = "", mMeetingToTime = "", mMeetingStatus = "", mDesctiption = "";
+            mMeetingDate = "", mMeetingFromTime = "", mMeetingToTime = "", mMeetingStatus = "", mDescription = "", mMeetingID = "";
     ArrayAdapter adapter;
     Spinner spinnerMeetingStatus;
-    TextView tvCustomerName, tvCustomerLocation, tvSalesPerson, tvMeetingDate, tvMeetingFrom, tvMeetingTo;
+    TextView tvCustomerName, tvCustomerLocation, tvSalesPerson, tvMeetingDate, tvMeetingFrom, tvMeetingTo, tvMeetingUpdatedFrom,
+            tvMeetingUpdatedOn, tvMeetingUpdates;
     EditText txtMeetingDescription;
-    RelativeLayout layoutCustomerName, layoutCustomerLocation, layoutSalesPerson;
+    RelativeLayout layoutCustomerName, layoutCustomerLocation, layoutSalesPerson, layoutMeetingUpdatedFrom, layoutMeetingUpdatedOn,
+            layoutMeetingUpdates;
     ArrayList<Reportees> reporteesList;
     ArrayList<Customer> customerList;
+    ArrayList<CustomerLocation> customerLocationsList;
     private boolean todaySelected = false;
+    Meetings data;
+    private boolean isUpdate = false;
 
     public AddScheduleFragment() {
         // Required empty public constructor
@@ -99,6 +104,16 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
 
     private void init() {
 
+        Bundle extras = getArguments();
+        if (extras != null) {
+            if (extras.containsKey("selected_item")) {
+                data = extras.getParcelable("selected_item");
+                if (data != null) {
+                    isUpdate = true;
+                }
+            }
+        }
+
         myCalendar = Calendar.getInstance();
         btnCreateSchedule = view.findViewById(R.id.btn_create_schedule);
         tvCustomerName = view.findViewById(R.id.tv_customer_name);
@@ -107,15 +122,29 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         tvMeetingDate = view.findViewById(R.id.tv_meeting_date);
         tvMeetingFrom = view.findViewById(R.id.tv_meeting_from_time);
         tvMeetingTo = view.findViewById(R.id.tv_meeting_to_time);
+        tvMeetingUpdatedFrom = view.findViewById(R.id.et_status_from);
+        tvMeetingUpdatedOn = view.findViewById(R.id.et_status_on);
+        tvMeetingUpdates = view.findViewById(R.id.et_meeting_update);
         txtMeetingDescription = view.findViewById(R.id.et_description);
         spinnerMeetingStatus = view.findViewById(R.id.spinner_status);
         layoutCustomerName = view.findViewById(R.id.relative_customer_name);
         layoutCustomerLocation = view.findViewById(R.id.relative_customer_location);
         layoutSalesPerson = view.findViewById(R.id.relative_sales_person);
+        layoutMeetingUpdatedFrom = view.findViewById(R.id.relative_status_from);
+        layoutMeetingUpdatedOn = view.findViewById(R.id.relative_status_on);
+        layoutMeetingUpdates = view.findViewById(R.id.relative_meeting_update);
 
         configureStatusSpinner();
 
-        getCustomerList();
+
+        reporteesList = (ArrayList<Reportees>) Preferences.sharedInstance().getReporteeResponse().getReportingList();
+
+        if (isUpdate) {
+            setupUpdateDetails(data);
+        } else {
+            getCustomerList();
+        }
+
 
         btnCreateSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +179,12 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         layoutCustomerName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (customerList != null && customerList.size() == 0) {
+                    showErrorToast("No Customer Found. Please create a customer!");
+                    return;
+                }
+
                 SelectFragment fragment = new SelectFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("select_list", customerList);
@@ -162,18 +197,35 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         layoutCustomerLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SelectFragment fragment = new SelectFragment();
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("select_list", customerList.get(0).getLocationList());
-                fragment.setArguments(bundle);
-                fragment.setCancelable(false);
-                fragment.show(getChildFragmentManager(), "SelectSalesFragment");
+                if (customerList != null && mCustomerID.equalsIgnoreCase("")) {
+                    showErrorToast("Please select Customer!");
+                    return;
+                }
+
+                customerLocationsList = getCustomerLocationList(mCustomerID);
+
+                if (customerLocationsList != null && customerLocationsList.size() == 0) {
+                    showErrorToast("No locations found for selected customer. Please add location to customer!");
+                    return;
+                }
+
+                if (customerList != null && customerList.size() > 0) {
+                    SelectFragment fragment = new SelectFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList("select_list", customerList.get(0).getLocationList());
+                    fragment.setArguments(bundle);
+                    fragment.setCancelable(false);
+                    fragment.show(getChildFragmentManager(), "SelectSalesFragment");
+                }
             }
         });
         layoutSalesPerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reporteesList = (ArrayList<Reportees>) Preferences.sharedInstance().getReporteeResponse().getReportingList();
+                if (reporteesList != null && reporteesList.size() == 0) {
+                    showErrorToast("No employees found. Please create employees!");
+                    return;
+                }
                 SelectFragment fragment = new SelectFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelableArrayList("select_list", reporteesList);
@@ -183,6 +235,79 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
             }
         });
 
+    }
+
+    private ArrayList<CustomerLocation> getCustomerLocationList(String mCustomerID) {
+        for (Customer customer : customerList) {
+            if (customer.getCustomerId().equalsIgnoreCase(mCustomerID)) {
+                return customer.getLocationList();
+            }
+        }
+        return null;
+    }
+
+    private void setupUpdateDetails(Meetings data) {
+
+        mSalesName = getEmployeeName(data.getEmployeeId());
+        mCustomerName = data.getCustomerName();
+        mCustomerLocation = data.getCustomerLocationName();
+        mCustomerID = data.getCustomerID();
+        mSalesID = data.getEmployeeId();
+        mCustomerLocationID = data.getCustomerLocationID();
+        mMeetingDate = data.getScheduledDate();
+        mMeetingFromTime = data.getMeetingFromTime();
+        mMeetingToTime = data.getMeetingToTime();
+        mDescription = data.getDescription();
+        mMeetingID = data.getMeetingID();
+
+        tvCustomerName.setText(mCustomerName);
+        tvCustomerLocation.setText(mCustomerLocation);
+        tvSalesPerson.setText(mSalesName);
+        tvMeetingDate.setText(mMeetingDate);
+        tvMeetingFrom.setText(mMeetingFromTime);
+        tvMeetingTo.setText(mMeetingToTime);
+        txtMeetingDescription.setText(mDescription);
+        btnCreateSchedule.setText("Update");
+
+        if (data.getMeetingStatus().equalsIgnoreCase("New Appointment")) {
+            spinnerMeetingStatus.setSelection(0);
+        } else if (data.getMeetingStatus().equalsIgnoreCase("Meeting Cancelled")) {
+            spinnerMeetingStatus.setSelection(2);
+        } else if (data.getMeetingStatus().equalsIgnoreCase("Meeting Completed")) {
+            spinnerMeetingStatus.setSelection(1);
+        }
+
+        if (data.getMeetingStatus().equalsIgnoreCase("Meeting Completed") ||
+                data.getMeetingStatus().equalsIgnoreCase("Meeting Cancelled")) {
+            layoutCustomerName.setEnabled(false);
+            layoutCustomerLocation.setEnabled(false);
+            layoutSalesPerson.setEnabled(false);
+            tvMeetingDate.setEnabled(false);
+            tvMeetingFrom.setEnabled(false);
+            tvMeetingTo.setEnabled(false);
+            txtMeetingDescription.setEnabled(false);
+            btnCreateSchedule.setEnabled(false);
+            tvMeetingUpdatedFrom.setText(data.getStatusUpdatedFrom());
+            tvMeetingUpdatedOn.setText(data.getStatusUpdatedOn());
+            tvMeetingUpdates.setText(data.getMeetingUpdates());
+            layoutMeetingUpdatedFrom.setVisibility(View.VISIBLE);
+            layoutMeetingUpdatedOn.setVisibility(View.VISIBLE);
+            layoutMeetingUpdates.setVisibility(View.VISIBLE);
+            btnCreateSchedule.setAlpha(0.5f);
+        } else {
+            getCustomerList();
+        }
+
+    }
+
+    private String getEmployeeName(String employeeId) {
+        String employeeName = "";
+        for (Reportees reportees : reporteesList) {
+            if (employeeId.equalsIgnoreCase(reportees.getEmpId())) {
+                employeeName = reportees.getEmpName();
+            }
+        }
+        return employeeName;
     }
 
     private void getCustomerList() {
@@ -277,7 +402,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
 
     private void onCreateScheduleClicked() {
 
-        mDesctiption = txtMeetingDescription.getText().toString();
+        mDescription = txtMeetingDescription.getText().toString();
 
         if (mCustomerName.equalsIgnoreCase("")) {
             showErrorToast("Please select Customer!");
@@ -300,7 +425,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         } else if (!mMeetingStatus.equalsIgnoreCase("New Appointment")) {
             showErrorToast("Meeting status should be New Appointment!");
             return;
-        } else if (mDesctiption.equalsIgnoreCase("")) {
+        } else if (mDescription.equalsIgnoreCase("")) {
             showErrorToast("Please enter description!");
             return;
         }
@@ -309,7 +434,8 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
             mListener.showLoading();
         }
 
-        String[] params = {mCustomerID, mSalesID, mCustomerLocationID, mMeetingDate, mMeetingFromTime, mMeetingToTime, mDesctiption};
+        String[] params = {mCustomerID, mSalesID, mCustomerLocationID, mMeetingDate, mMeetingFromTime, mMeetingToTime, mDescription,
+                mMeetingID};
         try {
             new CreateMeetingTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
                 @Override
@@ -319,10 +445,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
 
                     if (mListener != null) {
                         mListener.hideLoading();
-                    }
-
-                    if (getFragmentManager() != null) {
-                        getFragmentManager().popBackStack();
+                        mListener.onFragmentInteraction("ON_MEETING_CREATE");
                     }
                 }
 
@@ -349,6 +472,8 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 mMeetingStatus = parentView.getSelectedItem().toString();
+                spinnerMeetingStatus.setAlpha(0.5f);
+                spinnerMeetingStatus.setEnabled(false);
             }
 
             @Override

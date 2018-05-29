@@ -3,6 +3,7 @@ package com.teamtrack.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -45,7 +46,7 @@ public class LoginFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_login, container, false);
         }
@@ -151,7 +152,7 @@ public class LoginFragment extends Fragment {
                         if (response.getDesignation_id().equals("1")) {
                             userType = "MANAGER";
                         } else {
-                            userType = "SALES";
+                            userType = "SALES_PERSON";
                         }
                         Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_TYPE, userType);
                         Preferences.sharedInstance().put(Preferences.Key.EMPLOYEE_REF_ID, response.getUnique_ref_id());

@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 loadUserHome();
                 break;
             case "Create Meeting":
-                loadAddScheduleFragment();
+                loadAddScheduleFragment(null);
                 break;
             case "Locate Team":
                 loadAdminFragment("LOCATE_ME");
@@ -197,10 +197,14 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         switch (action) {
             case "ADD_SCHEDULE":
                 navigationView.getMenu().getItem(1).setChecked(true);
-                loadAddScheduleFragment();
+                loadAddScheduleFragment(null);
                 break;
             case "SALES":
                 loadSalesFragment(args[0]);
+                break;
+            case "ON_MEETING_CREATE":
+                navigationView.getMenu().getItem(0).setChecked(true);
+                loadUserHome();
                 break;
             default:
                 break;
@@ -218,6 +222,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 break;
             case "SCHEDULE_LIST_SELECT":
                 loadScheduleDetailsFragment(bundle);
+                break;
+            case "UPDATE_MEETING":
+                loadAddScheduleFragment(bundle);
                 break;
             default:
                 break;
@@ -253,11 +260,15 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         }
     }
 
-    private void loadAddScheduleFragment() {
+    private void loadAddScheduleFragment(Bundle bundle) {
+
+        AddScheduleFragment fragment = AddScheduleFragment.newInstance();
+        fragment.setArguments(bundle);
+
         getSupportFragmentManager()
                 .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, AddScheduleFragment.newInstance(), "AddScheduleFragment")
+                .replace(R.id.fragment_container, fragment, "AddScheduleFragment")
                 .commit();
     }
 

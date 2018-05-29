@@ -182,7 +182,7 @@ public class Meetings implements Parcelable {
     }
 
     public String getStatusUpdatedFrom() {
-        return statusUpdatedFrom;
+        return statusUpdatedFrom != null ? statusUpdatedFrom : "";
     }
 
     public void setStatusUpdatedFrom(String statusUpdatedFrom) {
@@ -190,7 +190,7 @@ public class Meetings implements Parcelable {
     }
 
     public String getStatusUpdatedOn() {
-        return statusUpdatedOn;
+        return statusUpdatedOn != null ? statusUpdatedOn : "";
     }
 
     public void setStatusUpdatedOn(String statusUpdatedOn) {
@@ -198,7 +198,7 @@ public class Meetings implements Parcelable {
     }
 
     public String getMeetingUpdates() {
-        return meetingUpdates;
+        return meetingUpdates != null ? meetingUpdates : "";
     }
 
     public void setMeetingUpdates(String meetingUpdates) {
