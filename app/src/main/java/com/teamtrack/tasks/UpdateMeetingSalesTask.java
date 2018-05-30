@@ -10,38 +10,45 @@ import com.network.VolleySingleton;
 import com.network.requests.GSONRequest;
 import com.teamtrack.BuildConfig;
 import com.teamtrack.listeners.OnTaskCompletionListener;
-import com.teamtrack.model.Customer;
-import com.teamtrack.model.response.CustomerListResponse;
+import com.teamtrack.model.Meetings;
 
 import java.lang.ref.WeakReference;
 
-public class GetCustomersTask {
+public class UpdateMeetingSalesTask {
 
     private WeakReference<Context> context;
-    private OnTaskCompletionListener<Customer> listener;
-    private String refID;
+    private OnTaskCompletionListener<Meetings> listener;
+    private String[] params;
 
-    public GetCustomersTask(Context context, OnTaskCompletionListener<Customer> listener, String refID) {
+    public UpdateMeetingSalesTask(Context context, OnTaskCompletionListener<Meetings> listener, String... params) {
         this.context = new WeakReference<>(context);
         this.listener = listener;
-        this.refID = refID;
+        this.params = params;
     }
 
     public void execute() {
+        String mParams;
+        if (params.length >= 5) {
+            mParams = "meetid=" + params[0] + "&status_from=" + params[1] + "&updated_on=" + params[2] + "&meeting_update=" + params[3]
+                    + "&status=" + params[4];
+        } else {
+            throw new ArrayIndexOutOfBoundsException("Params should contain all 5 parameters");
+        }
 
-        String url = BuildConfig.SERVER_URL + BuildConfig.CUSTOMER_LIST_OTP_URL;
+        mParams = mParams.replace(" ", "%20");
 
-        GSONRequest request = new GSONRequest(Request.Method.GET, url, CustomerListResponse.class, null,
-                new Response.Listener<CustomerListResponse>() {
+        String url = BuildConfig.SERVER_URL + BuildConfig.UPDATE_MEETING_URL + mParams;
+
+        GSONRequest request = new GSONRequest(Request.Method.GET, url, Meetings.class, null,
+                new Response.Listener<Meetings>() {
                     @Override
-                    public void onResponse(CustomerListResponse response) {
+                    public void onResponse(Meetings response) {
                         Log.d("onResponse :", response.toString());
 
-                        if (response.getCustomerList() != null) {
-                            if (listener != null) {
-                                listener.onTaskCompleted(response.getCustomerList());
-                            }
+                        if (listener != null) {
+                            listener.onTaskCompleted(null);
                         }
+
                     }
                 }, new Response.ErrorListener() {
             @Override

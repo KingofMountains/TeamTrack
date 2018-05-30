@@ -141,6 +141,10 @@ public class LoginFragment extends Fragment {
 
     private void validateOTP(String mobile, String otp) {
 
+        if (mListener != null) {
+            mListener.showLoading();
+        }
+
         String url = BuildConfig.SERVER_URL + BuildConfig.VALIDATE_OTP_URL + "mobile=" + mobile + "&otp=" + otp;
 
         GSONRequest request = new GSONRequest(Request.Method.GET, url, RegisterUserResponse.class, null,

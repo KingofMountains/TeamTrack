@@ -91,10 +91,6 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
 
         Bundle extras = getArguments();
 
-        if (mListener != null) {
-            mListener.hideSideMenu(true);
-        }
-
         rvSchedules = view.findViewById(R.id.rv_schedules);
         tvNoDataFound = view.findViewById(R.id.tv_no_data_found);
         layoutManager = new LinearLayoutManager(thisActivity, LinearLayoutManager.VERTICAL, false);
@@ -167,8 +163,7 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
         if (mListener != null) {
             Bundle bundle = new Bundle();
             bundle.putParcelable("selected_item", meetingsList.get(position));
-            if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")
-                    && !meetingsList.get(position).getMeetingStatus().equalsIgnoreCase("Meeting Completed")) {
+            if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
                 mListener.onFragmentInteraction("SCHEDULE_LIST_SELECT", bundle);
             } else {
                 mListener.onFragmentInteraction("UPDATE_MEETING", bundle);

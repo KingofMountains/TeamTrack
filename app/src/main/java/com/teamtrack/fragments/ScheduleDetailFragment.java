@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,7 +30,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.teamtrack.R;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
+import com.teamtrack.listeners.OnTaskCompletionListener;
 import com.teamtrack.model.Meetings;
+import com.teamtrack.tasks.UpdateMeetingSalesTask;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -40,7 +41,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class ScheduleDetailFragment extends Fragment implements LocationListener {
+public class ScheduleDetailFragment extends Fragment {
 
     View view;
     OnFragmentInteractionListener mListener;
@@ -51,8 +52,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
     Meetings data;
     ArrayAdapter adapter;
     Spinner spinnerMeetingStatus;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private String mMeetingStatus = "";
+    private String mMeetingStatus = "", mStatusUpdatedFrom = "", mStatusUpdatedOn = "", mMeetingUpdates = "", mMeetingId = "";
 
 
     public ScheduleDetailFragment() {
@@ -109,7 +109,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
         btnCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fetchCurrentLocation();
+                canProceedToUpdate();
             }
         });
 
@@ -119,9 +119,40 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                 tvCustomerName.setText(data.getCustomerName());
                 tvLocation.setText(data.getCustomerLocationName());
                 tvDescription.setText(data.getDescription());
+                mMeetingId = data.getMeetingID();
+
+                if (data.getMeetingStatus().equalsIgnoreCase("Meeting Completed") ||
+                        data.getMeetingStatus().equalsIgnoreCase("Meeting Cancelled")) {
+                    btnCheckIn.setEnabled(false);
+                    btnCheckIn.setAlpha(0.5f);
+                    spinnerMeetingStatus.setSelection(data.getMeetingStatus().equalsIgnoreCase("Meeting Completed") ? 1 : 2);
+                    spinnerMeetingStatus.setEnabled(false);
+                    spinnerMeetingStatus.setAlpha(0.5f);
+                }
+
             }
         }
     }
+
+    private void canProceedToUpdate() {
+
+        mMeetingUpdates = etRemarks.getText().toString();
+
+        if (mMeetingUpdates.equalsIgnoreCase("")) {
+            showErrorToast("Please enter meeting updates!");
+            return;
+        } else if (mMeetingStatus.equalsIgnoreCase("1")) {
+            showErrorToast("Please change meeting status!");
+            return;
+        }
+
+        fetchCurrentLocation();
+    }
+
+    private void showErrorToast(String message) {
+        Toast.makeText(thisActivity, message, Toast.LENGTH_LONG).show();
+    }
+
 
     public void configureStatusSpinner() {
 
@@ -131,7 +162,7 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
         spinnerMeetingStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                mMeetingStatus = "" + position + 1;
+                mMeetingStatus = "" + (position + 1);
             }
 
             @Override
@@ -148,13 +179,14 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
             mListener.showLoading();
         }
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(thisActivity);
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(thisActivity);
 
         if (ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager
                         .PERMISSION_GRANTED) {
             return;
         }
+
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(thisActivity, new OnSuccessListener<Location>() {
                     @Override
@@ -173,28 +205,6 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                         .show();
             }
         });
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        new UpdateScheduleTask(location).execute("");
-
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
     }
 
     private class UpdateScheduleTask extends AsyncTask<String, Void, String> {
@@ -223,8 +233,8 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
                 if (addresses != null) {
                     currentAddress = addresses.get(0);
                     DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
-                    String date = df.format(Calendar.getInstance().getTime());
-                    String sLocation = currentAddress.getSubLocality() + "," + currentAddress.getLocality();
+                    mStatusUpdatedOn = df.format(Calendar.getInstance().getTime());
+                    mStatusUpdatedFrom = currentAddress.getSubLocality() + "," + currentAddress.getLocality();
                     returnStatus = "success";
                 } else {
                     returnStatus = null;
@@ -240,20 +250,51 @@ public class ScheduleDetailFragment extends Fragment implements LocationListener
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            updateMeetingTask();
+        }
+    }
+
+    private void updateMeetingTask() {
+
+        if (mStatusUpdatedFrom.equalsIgnoreCase("")) {
+            showErrorToast("Couldn't get your location. Please try again!");
 
             if (mListener != null) {
                 mListener.hideLoading();
             }
-            if (result != null && result.equalsIgnoreCase("success")) {
+            return;
+        } else if (mStatusUpdatedOn.equalsIgnoreCase("")) {
+            showErrorToast("Couldn't get your time. Please try again!");
+
+            if (mListener != null) {
+                mListener.hideLoading();
+            }
+            return;
+        }
+
+        String[] params = {mMeetingId, mStatusUpdatedFrom, mStatusUpdatedOn, mMeetingUpdates, mMeetingStatus.trim()};
+
+        new UpdateMeetingSalesTask(thisActivity.getApplicationContext(), new OnTaskCompletionListener<Meetings>() {
+            @Override
+            public void onTaskCompleted(List<Meetings> list) {
+
                 Toast.makeText(thisActivity, "Meetings updated successfully!", Toast.LENGTH_SHORT).show();
+
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
                 if (getFragmentManager() != null) {
                     getFragmentManager().popBackStack();
                 }
-            } else {
-                Toast.makeText(thisActivity, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
 
+            @Override
+            public void onError(String errorMessage) {
+                if (mListener != null) {
+                    mListener.hideLoading();
+                }
+            }
+        }, params).execute();
+    }
 }
 

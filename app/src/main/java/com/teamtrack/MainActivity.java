@@ -214,9 +214,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     public void onFragmentInteraction(String action, Bundle bundle) {
         switch (action) {
-            case "SALES":
-                loadScheduleDetailsFragment(bundle);
-                break;
             case "LOCATE_ME":
                 loadLocateTeamFragment(bundle);
                 break;
