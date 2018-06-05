@@ -170,9 +170,6 @@ public class SalesFragment extends Fragment {
             return mNumOfTabs;
         }
 
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
     }
 
 }

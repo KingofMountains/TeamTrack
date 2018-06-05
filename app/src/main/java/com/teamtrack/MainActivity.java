@@ -1,14 +1,17 @@
 package com.teamtrack;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +21,27 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.firebase.jobdispatcher.Driver;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.Trigger;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.fragments.AddScheduleFragment;
 import com.teamtrack.fragments.AdminFragment;
@@ -26,14 +49,26 @@ import com.teamtrack.fragments.LocateTeamFragment;
 import com.teamtrack.fragments.SalesFragment;
 import com.teamtrack.fragments.ScheduleDetailFragment;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
+import com.teamtrack.services.ReminderService;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+import java.util.concurrent.TimeUnit;
+
+public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
+
+    private static final String REMINDER_JOB_TAG = "LOCATION_UPDATE_JOB";
+    private static final int REQUEST_CHECK_SETTINGS = 101;
+
+    final int periodicity = (int) TimeUnit.HOURS.toSeconds(1); // Every 1 hour periodicity expressed as seconds
+    final int toleranceInterval = (int) TimeUnit.MINUTES.toSeconds(15); // a small(ish) window of time when triggering is OK
+
 
     ProgressDialog dialog;
     private DrawerLayout drawerLayout;
     LocationManager locationManager;
     Menu menu;
     NavigationView navigationView;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,16 +77,17 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         initialize();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void initialize() {
+
+        setUpGoogleClient();
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Team Track");
         setSupportActionBar(toolbar);
-
-//        // add back arrow to toolbar
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        }
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
@@ -73,10 +109,53 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 });
         configureProgressLoading();
 
-        CheckGpsStatus();
+        checkGpsStatus();
+
+        if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
+            scheduleLocationUpdateJob();
+        }
+
     }
 
-    public void CheckGpsStatus() {
+    private void setUpGoogleClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+
+    private void scheduleLocationUpdateJob() {
+
+        int SYNC_FLEXTIME_SECONDS = (int) TimeUnit.HOURS.toSeconds(1);
+
+        Driver driver = new GooglePlayDriver(this);
+        FirebaseJobDispatcher firebaseJobDispatcher = new FirebaseJobDispatcher(driver);
+        Job constraintReminderJob = firebaseJobDispatcher.newJobBuilder()
+                .setService(ReminderService.class)
+                .setTag(REMINDER_JOB_TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setRecurring(true)
+                .setTrigger(Trigger.executionWindow(0, SYNC_FLEXTIME_SECONDS))
+                .setReplaceCurrent(true)
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .build();
+        firebaseJobDispatcher.schedule(constraintReminderJob);
+
+//        Intent intent = new Intent(getApplicationContext(), LocationService.class);
+//        intent.putExtra("reference_id", Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID));
+//        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent,
+//                PendingIntent.FLAG_UPDATE_CURRENT);
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+//        if (alarmManager != null) {
+//            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * 60, pendingIntent);
+//        }
+    }
+
+
+    public void checkGpsStatus() {
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean GpsStatus = false;
@@ -86,8 +165,54 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         if (GpsStatus || Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
             loadUserHome();
         } else {
-            showGPSAlert();
+            requestLocationSettings();
         }
+
+    }
+
+    private void requestLocationSettings() {
+
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+        Task<LocationSettingsResponse> task = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
+
+        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(Task<LocationSettingsResponse> task) {
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                    // All location settings are satisfied. The client can initialize location
+                    // requests here.
+                } catch (ApiException exception) {
+                    switch (exception.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the
+                            // user a dialog.
+                            try {
+                                // Cast to a resolvable exception.
+                                ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            } catch (ClassCastException e) {
+                                // Ignore, should be an impossible error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // Location settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            }
+        });
 
     }
 
@@ -97,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 .setMessage("You have to turn on GPS to access the application!")
                 .setPositiveButton("Turn On", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                         dialog.dismiss();
                     }
                 })
@@ -155,8 +280,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                     }
                 }
             }
-        } else {
-            loadSalesFragment(Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID));
         }
     }
 
@@ -275,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, fragment, "ScheduleDetailFragment")
+                .add(R.id.fragment_container, fragment, "ScheduleDetailFragment")
                 .addToBackStack("ScheduleDetailFragment")
                 .commit();
     }
@@ -297,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                     .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
                     .replace(R.id.fragment_container, SalesFragment.newInstance(refID), "SalesFragment")
-                    .commit();
+                    .commitAllowingStateLoss();
         }
     }
 
@@ -329,5 +452,46 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                         .commit();
             }
         }, 100);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        showToastMessage("Location enabled");
+                        loadUserHome();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+                        showToastMessage("Location cancelled by user");
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void showToastMessage(String message) {
+        Toast.makeText(this, "" + message, Toast.LENGTH_SHORT).show();
     }
 }

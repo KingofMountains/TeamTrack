@@ -24,6 +24,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -91,6 +93,10 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
 
         Bundle extras = getArguments();
 
+        if (mListener != null) {
+            mListener.hideSideMenu(true);
+        }
+
         rvSchedules = view.findViewById(R.id.rv_schedules);
         tvNoDataFound = view.findViewById(R.id.tv_no_data_found);
         layoutManager = new LinearLayoutManager(thisActivity, LinearLayoutManager.VERTICAL, false);
@@ -120,6 +126,9 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
 
     private List<Meetings> getMeetingList(List<Meetings> meeting_list, int type) {
 
+        String myFormat = "dd MMM yyy";
+        final SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
         List<Meetings> currentList = new ArrayList<>();
 
         for (Meetings meeting : meeting_list) {
@@ -130,6 +139,27 @@ public class SalesMeetingsFragment extends Fragment implements OnItemSelectedLis
                 currentList.add(meeting);
             }
         }
+
+        Collections.sort(currentList, new Comparator<Meetings>() {
+            @Override
+            public int compare(Meetings object1, Meetings object2) {
+                try {
+                    Date objectOneDate = sdf.parse(object1.getScheduledDate());
+                    Date objectTwoDate = sdf.parse(object2.getScheduledDate());
+                    if (objectOneDate.after(objectTwoDate))
+                        return -1;
+                   else if (objectOneDate.before(objectTwoDate))
+                        return 1;
+                   else
+                        return 0;
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                return 0;
+            }
+        });
 
         return currentList;
     }

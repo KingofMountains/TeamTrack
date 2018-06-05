@@ -3,6 +3,7 @@ package com.teamtrack.tasks;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -66,6 +67,8 @@ public class CreateMeetingTask {
         });
 
         VolleySingleton.getInstance(context.get()).getRequestQueue().add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
 }

@@ -8,22 +8,13 @@
               android:orientation="vertical"
               tools:context="com.teamtrack.fragments.LoginFragment">
 
-    <!--<TextView android:layout_height="40dp"-->
-              <!--android:layout_width="match_parent"-->
-              <!--android:gravity="center"-->
-              <!--android:textColor="#FFFFFF"-->
-              <!--android:textSize="16sp"-->
-              <!--android:background="@color/colorPrimary"-->
-              <!--android:text="Today's Schedules"/>-->
-
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/rv_schedules"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"/>-->
-
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout_sales"
         android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+        app:tabSelectedTextColor="@android:color/white"
+        app:tabTextColor="@color/primaryLightColor"
+        app:tabIndicatorColor="@color/primaryLightColor"
         android:layout_height="wrap_content"
         app:tabMode="fixed" />
 

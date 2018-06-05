@@ -17,6 +17,7 @@ android {
         buildConfigField "String", "CREATE_MEETING_URL", "\"manager/createmeeting?\""
         buildConfigField "String", "MEETING_LIST_URL", "\"employee/meetinglist?\""
         buildConfigField "String", "UPDATE_MEETING_URL", "\"employee/updatemeeting?\""
+        buildConfigField "String", "LOCATION_UPDATE_URL", "\"employee/locationupdate?\""
     }
     buildTypes {
         release {
@@ -41,6 +42,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'com.github.hotchemi:permissionsdispatcher:3.2.0'
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:3.2.0"
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 }
 repositories {
     mavenCentral()

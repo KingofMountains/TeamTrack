@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <supports-screens android:xlargeScreens="true"/>
 
@@ -21,7 +22,6 @@
             android:name=".SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/LoginTheme">
-
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -49,6 +49,14 @@
 
         <service
             android:name="com.teamtrack.services.LocationService"/>
+
+        <service
+            android:exported="false"
+            android:name=".services.ReminderService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

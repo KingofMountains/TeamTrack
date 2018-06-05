@@ -20,6 +20,10 @@ import com.teamtrack.R;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.model.Reportees;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -91,10 +95,11 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
         if (extras != null && extras.containsKey("selected_item")) {
             data = extras.getParcelable("selected_item");
             if (data != null) {
-
                 tvEmployeeName.setText(data.getEmpName() != null ? data.getEmpName() : "null");
-                tvLastUpdated.setText(data.getLastUpdatedLocation() != null ? data.getLastUpdatedLocation() : "null");
-
+                DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
+                String lastUpdatedTime = data.getLastUpdatedLocation() != null ? data.getLastUpdatedLocation() : "null";
+                lastUpdatedTime = df.format(lastUpdatedTime);
+                tvLastUpdated.setText(lastUpdatedTime);
                 try {
                     latitude = Double.valueOf(data.getLatitude());
                     longitude = Double.valueOf(data.getLongitude());
