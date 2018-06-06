@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.teamtrack.model.response.CustomerListResponse;
 import com.teamtrack.model.response.ReporteeListResponse;
 
 public class Preferences<T> {
@@ -19,7 +20,8 @@ public class Preferences<T> {
         EMPLOYEE_ID,
         EMPLOYEE_TYPE,
         EMPLOYEE_REF_ID,
-        REPORTEE_LIST
+        REPORTEE_LIST,
+        CUSTOMER_LIST
     }
 
     private Preferences(Context context) {
@@ -90,6 +92,10 @@ public class Preferences<T> {
     }
 
     public ReporteeListResponse getReporteeResponse() {
-        return gson.fromJson(getString(Key.REPORTEE_LIST),ReporteeListResponse.class);
+        return gson.fromJson(getString(Key.REPORTEE_LIST), ReporteeListResponse.class);
+    }
+
+    public CustomerListResponse getCustomerResponse() {
+        return gson.fromJson(getString(Key.CUSTOMER_LIST), CustomerListResponse.class);
     }
 }

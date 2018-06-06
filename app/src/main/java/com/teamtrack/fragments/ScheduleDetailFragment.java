@@ -1,9 +1,7 @@
 package com.teamtrack.fragments;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -11,8 +9,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +22,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.teamtrack.R;
 import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.listeners.OnTaskCompletionListener;
 import com.teamtrack.model.Meetings;
+import com.teamtrack.services.SingleShotLocationProvider;
 import com.teamtrack.tasks.UpdateMeetingSalesTask;
 
 import java.io.IOException;
@@ -119,6 +114,7 @@ public class ScheduleDetailFragment extends Fragment {
                 tvCustomerName.setText(data.getCustomerName());
                 tvLocation.setText(data.getCustomerLocationName());
                 tvDescription.setText(data.getDescription());
+                etRemarks.setText(data.getMeetingUpdates());
                 mMeetingId = data.getMeetingID();
 
                 if (data.getMeetingStatus().equalsIgnoreCase("Meeting Completed") ||
@@ -179,32 +175,50 @@ public class ScheduleDetailFragment extends Fragment {
             mListener.showLoading();
         }
 
-        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(thisActivity);
+//        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(thisActivity);
+//
+//        if (ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager
+//                        .PERMISSION_GRANTED) {
+//            return;
+//        }
+//
+//        mFusedLocationClient.getLastLocation()
+//                .addOnSuccessListener(thisActivity, new OnSuccessListener<Location>() {
+//                    @Override
+//                    public void onSuccess(Location location) {
+//                        // Got last known location. In some rare situations this can be null.
+//                        if (location != null) {
+//                            // Logic to handle location object
+//                            new UpdateScheduleTask(location).execute("");
+//                        } else {
+//                            if (mListener != null) {
+//                                mListener.hideLoading();
+//                            }
+//                        }
+//                    }
+//                }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//
+//                if (mListener != null) {
+//                    mListener.hideLoading();
+//                }
+//
+//                Toast.makeText(thisActivity, "Couldn't get your location. Please make sure GPS is enabled and try again",
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+//            }
+//        });
 
-        if (ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(thisActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager
-                        .PERMISSION_GRANTED) {
-            return;
-        }
-
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(thisActivity, new OnSuccessListener<Location>() {
+        SingleShotLocationProvider.requestSingleUpdate(thisActivity,
+                new SingleShotLocationProvider.LocationCallback() {
                     @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-                            new UpdateScheduleTask(location).execute("");
-                        }
+                    public void onNewLocationAvailable(Location location) {
+                        Log.d("Location", "my location is " + location.toString());
+                        new UpdateScheduleTask(location).execute("");
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(thisActivity, "Couldn't get your location. Please make sure GPS is enabled and try again",
-                        Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
+                });
     }
 
     private class UpdateScheduleTask extends AsyncTask<String, Void, String> {
@@ -232,7 +246,7 @@ public class ScheduleDetailFragment extends Fragment {
                 Address currentAddress;
                 if (addresses != null) {
                     currentAddress = addresses.get(0);
-                    DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
+                    DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, hh:mm a", Locale.US);
                     mStatusUpdatedOn = df.format(Calendar.getInstance().getTime());
                     mStatusUpdatedFrom = currentAddress.getSubLocality() + "," + currentAddress.getLocality();
                     returnStatus = "success";

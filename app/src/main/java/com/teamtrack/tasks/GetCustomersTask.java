@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.network.VolleySingleton;
 import com.network.requests.GSONRequest;
 import com.teamtrack.BuildConfig;
+import com.teamtrack.Utilities.Preferences;
 import com.teamtrack.listeners.OnTaskCompletionListener;
 import com.teamtrack.model.Customer;
 import com.teamtrack.model.response.CustomerListResponse;
@@ -41,6 +42,7 @@ public class GetCustomersTask {
                         if (response.getCustomerList() != null) {
                             if (listener != null) {
                                 listener.onTaskCompleted(response.getCustomerList());
+                                Preferences.sharedInstance().put(Preferences.Key.CUSTOMER_LIST, response);
                             }
                         }
                     }

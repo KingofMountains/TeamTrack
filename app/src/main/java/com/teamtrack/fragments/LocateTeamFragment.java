@@ -21,7 +21,9 @@ import com.teamtrack.listeners.OnFragmentInteractionListener;
 import com.teamtrack.model.Reportees;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -93,13 +95,29 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
         Bundle extras = getArguments();
 
         if (extras != null && extras.containsKey("selected_item")) {
+
             data = extras.getParcelable("selected_item");
+
             if (data != null) {
                 tvEmployeeName.setText(data.getEmpName() != null ? data.getEmpName() : "null");
-                DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
-                String lastUpdatedTime = data.getLastUpdatedLocation() != null ? data.getLastUpdatedLocation() : "null";
-                lastUpdatedTime = df.format(lastUpdatedTime);
-                tvLastUpdated.setText(lastUpdatedTime);
+
+                DateFormat fromFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss a", Locale.US);
+                fromFormat.setLenient(false);
+                DateFormat toFormat = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm a", Locale.US);
+                toFormat.setLenient(false);
+                Date date;
+                if (data.getLastUpdatedLocation() != null) {
+                    try {
+                        date = fromFormat.parse(data.getLastUpdatedLocation());
+                        String lastUpdatedTime = toFormat.format(date);
+                        tvLastUpdated.setText(lastUpdatedTime);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    tvLastUpdated.setText("No Location Update Yet!");
+                }
+
                 try {
                     latitude = Double.valueOf(data.getLatitude());
                     longitude = Double.valueOf(data.getLongitude());
@@ -123,6 +141,6 @@ public class LocateTeamFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         LatLng empLocation = new LatLng(latitude, longitude);
         googleMap.addMarker(new MarkerOptions().position(empLocation).title(data.getEmpName()));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(empLocation , 12));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(empLocation, 12));
     }
 }

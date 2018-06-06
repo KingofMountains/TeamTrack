@@ -9,10 +9,10 @@ import android.content.IntentSender;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +21,6 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.firebase.jobdispatcher.Driver;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -43,6 +42,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.teamtrack.Utilities.Preferences;
+import com.teamtrack.Utilities.Utils;
 import com.teamtrack.fragments.AddScheduleFragment;
 import com.teamtrack.fragments.AdminFragment;
 import com.teamtrack.fragments.LocateTeamFragment;
@@ -58,10 +58,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     private static final String REMINDER_JOB_TAG = "LOCATION_UPDATE_JOB";
     private static final int REQUEST_CHECK_SETTINGS = 101;
-
-    final int periodicity = (int) TimeUnit.HOURS.toSeconds(1); // Every 1 hour periodicity expressed as seconds
-    final int toleranceInterval = (int) TimeUnit.MINUTES.toSeconds(15); // a small(ish) window of time when triggering is OK
-
 
     ProgressDialog dialog;
     private DrawerLayout drawerLayout;
@@ -80,6 +76,17 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!Utils.hasInternet(this)) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Internet connection not available!")
+                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            logout();
+                        }
+                    }).setCancelable(false).create().show();
+
+        }
     }
 
     private void initialize() {
@@ -170,6 +177,27 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     }
 
+    @Override
+    public void onBackPressed() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() >= 1) {
+            // If there are back-stack entries, leave the FragmentActivity
+            // implementation take care of them.
+            manager.popBackStack();
+
+        } else {
+            // Otherwise, ask user if he wants to leave :)
+            new AlertDialog.Builder(this)
+                    .setMessage("Are you sure you want to exit?")
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            logout();
+                        }
+                    }).create().show();
+        }
+    }
+
     private void requestLocationSettings() {
 
         LocationRequest mLocationRequest = new LocationRequest();
@@ -216,26 +244,26 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     }
 
-    private void showGPSAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Turn On GPS")
-                .setMessage("You have to turn on GPS to access the application!")
-                .setPositiveButton("Turn On", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                        dialog.dismiss();
-                        finish();
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
+//    private void showGPSAlert() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Turn On GPS")
+//                .setMessage("You have to turn on GPS to access the application!")
+//                .setPositiveButton("Turn On", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+//                        dialog.dismiss();
+//                    }
+//                })
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // do nothing
+//                        dialog.dismiss();
+//                        finish();
+//                    }
+//                })
+//                .setCancelable(false)
+//                .show();
+//    }
 
 
     private void loadMenuItemScreen(MenuItem menuItem) {
@@ -249,9 +277,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             case "Locate Team":
                 loadAdminFragment("LOCATE_ME");
                 break;
-            case "Logout":
-                logout();
-                break;
+//            case "Logout":
+//                logout();
+//                break;
             default:
                 break;
         }
@@ -310,8 +338,9 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     private void logout() {
-        startActivity(new Intent(MainActivity.this, SplashActivity.class));
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//        startActivity(new Intent(MainActivity.this, SplashActivity.class));
+//        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        Preferences.sharedInstance().remove(Preferences.Key.REPORTEE_LIST, Preferences.Key.CUSTOMER_LIST);
         finish();
     }
 
@@ -382,14 +411,22 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     private void loadAddScheduleFragment(Bundle bundle) {
 
-        AddScheduleFragment fragment = AddScheduleFragment.newInstance();
-        fragment.setArguments(bundle);
-
-        getSupportFragmentManager()
-                .beginTransaction()
+        if (bundle == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
 //                .setCustomAnimations(R.anim.slide_in_right, 0)
-                .replace(R.id.fragment_container, fragment, "AddScheduleFragment")
-                .commit();
+                    .replace(R.id.fragment_container, AddScheduleFragment.newInstance(), "AddScheduleFragment")
+                    .commit();
+        } else {
+            AddScheduleFragment fragment = AddScheduleFragment.newInstance();
+            fragment.setArguments(bundle);
+            getSupportFragmentManager()
+                    .beginTransaction()
+//                .setCustomAnimations(R.anim.slide_in_right, 0)
+                    .add(R.id.fragment_container, fragment, "AddScheduleFragmentUpdate")
+                    .addToBackStack("AddScheduleFragmentUpdate")
+                    .commit();
+        }
     }
 
     private void loadScheduleDetailsFragment(Bundle bundle) {
@@ -446,8 +483,8 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 fragment.setArguments(bundle);
                 getSupportFragmentManager()
                         .beginTransaction()
-//                .setCustomAnimations(R.anim.slide_in_right, 0)
-                        .add(R.id.fragment_container, fragment, "LocateTeamFragment")
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
+                        .replace(R.id.fragment_container, fragment, "LocateTeamFragment")
                         .addToBackStack("LocateTeamFragment")
                         .commit();
             }
@@ -477,12 +514,13 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         // All required changes were successfully made
-                        showToastMessage("Location enabled");
+//                        showToastMessage("Location enabled");
                         loadUserHome();
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
-                        showToastMessage("Location cancelled by user");
+//                        showToastMessage("Location cancelled by user");
+                        logout();
                         break;
                     default:
                         break;
@@ -491,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         }
     }
 
-    private void showToastMessage(String message) {
-        Toast.makeText(this, "" + message, Toast.LENGTH_SHORT).show();
-    }
+//    private void showToastMessage(String message) {
+//        Toast.makeText(this, "" + message, Toast.LENGTH_SHORT).show();
+//    }
 }

@@ -134,10 +134,9 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         layoutMeetingUpdatedOn = view.findViewById(R.id.relative_status_on);
         layoutMeetingUpdates = view.findViewById(R.id.relative_meeting_update);
 
-        configureStatusSpinner();
-
-
         reporteesList = (ArrayList<Reportees>) Preferences.sharedInstance().getReporteeResponse().getReportingList();
+
+        configureStatusSpinner();
 
         if (isUpdate) {
             setupUpdateDetails(data);
@@ -166,12 +165,23 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         tvMeetingFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mMeetingDate.equalsIgnoreCase("")) {
+                    showErrorToast("Select meeting date first!");
+                    return;
+                }
                 showTimePickerDialog("from_time");
             }
         });
         tvMeetingTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mMeetingDate.equalsIgnoreCase("")) {
+                    showErrorToast("Select meeting date first!");
+                    return;
+                } else if (mMeetingFromTime.equalsIgnoreCase("")) {
+                    showErrorToast("Select from time first!");
+                    return;
+                }
                 showTimePickerDialog("to_time");
             }
         });
@@ -212,7 +222,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
                 if (customerList != null && customerList.size() > 0) {
                     SelectFragment fragment = new SelectFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putParcelableArrayList("select_list", customerList.get(0).getLocationList());
+                    bundle.putParcelableArrayList("select_list", customerLocationsList);
                     fragment.setArguments(bundle);
                     fragment.setCancelable(false);
                     fragment.show(getChildFragmentManager(), "SelectSalesFragment");
@@ -312,6 +322,11 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
 
     private void getCustomerList() {
 
+        if (Preferences.sharedInstance().getCustomerResponse() != null) {
+            customerList = (ArrayList<Customer>) Preferences.sharedInstance().getCustomerResponse().getCustomerList();
+            return;
+        }
+
         if (mListener != null) {
             mListener.showLoading();
         }
@@ -350,18 +365,36 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
                 datetime.set(Calendar.HOUR_OF_DAY, selectedHour);
                 datetime.set(Calendar.MINUTE, selectedMinute);
                 if (datetime.getTimeInMillis() >= c.getTimeInMillis() || !todaySelected) {
-                    selectedHour %= 12;
+                    if (selectedHour > 12) {
+                        selectedHour %= 12;
+                    }
                     String selectedTime = String.format(Locale.US, "%02d:%02d %s", selectedHour == 0 ? 12 : selectedHour,
                             selectedMinute, selectedHour < 12 ? "AM" : "PM");
                     if (which.equalsIgnoreCase("from_time")) {
                         tvMeetingFrom.setText(selectedTime);
                         mMeetingFromTime = selectedTime;
                         tvMeetingFrom.setAlpha(1f);
+                        clearToTime();
                     } else {
                         tvMeetingTo.setText(selectedTime);
                         mMeetingToTime = selectedTime;
                         tvMeetingTo.setAlpha(1f);
+
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm a", Locale.US);
+                        Date fromTime = null, toTime = null;
+                        try {
+                            fromTime = dateFormat.parse(mMeetingDate + " " + mMeetingFromTime);
+                            toTime = dateFormat.parse(mMeetingDate + " " + mMeetingToTime);
+
+                            if (toTime.before(fromTime)) {
+                                showErrorToast("To time should be greater than From time!");
+                                clearToTime();
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
+
                 } else {
                     showErrorToast("Invalid time. Cannot select past time as date selected is today.");
                 }
@@ -370,6 +403,18 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         mTimePicker.setTitle("Select Time");
         mTimePicker.show();
 
+    }
+
+    private void clearFromTime() {
+        tvMeetingFrom.setText("HH:MM AM");
+        mMeetingFromTime = "";
+        tvMeetingFrom.setAlpha(0.5f);
+    }
+
+    private void clearToTime() {
+        tvMeetingTo.setText("HH:MM AM");
+        mMeetingToTime = "";
+        tvMeetingTo.setAlpha(0.5f);
     }
 
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
@@ -386,7 +431,7 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
     };
 
     private void updateLabel() {
-        String myFormat = "dd MMM yyy";
+        String myFormat = "dd MMM yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         tvMeetingDate.setText(sdf.format(myCalendar.getTime()));
         mMeetingDate = tvMeetingDate.getText().toString();
@@ -398,6 +443,9 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        clearFromTime();
+        clearToTime();
     }
 
     private void onCreateScheduleClicked() {
@@ -441,7 +489,11 @@ public class AddScheduleFragment<T> extends Fragment implements OnDialogItemSele
                 @Override
                 public void onTaskCompleted(List<Meetings> list) {
 
-                    showErrorToast("Meeting created successfully!");
+                    if (mMeetingID.equalsIgnoreCase("")) {
+                        showErrorToast("Meeting created successfully!");
+                    } else {
+                        showErrorToast("Meeting updated successfully!");
+                    }
 
                     if (mListener != null) {
                         mListener.hideLoading();

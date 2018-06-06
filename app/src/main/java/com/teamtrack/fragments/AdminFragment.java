@@ -122,6 +122,12 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
 
     private void getEmployeeList() {
 
+        if (Preferences.sharedInstance().getReporteeResponse() != null) {
+            reporteesList = Preferences.sharedInstance().getReporteeResponse().getReportingList();
+            setEmployeeAdapter(reporteesList);
+            return;
+        }
+
         if (mListener != null) {
             mListener.showLoading();
         }
@@ -129,9 +135,8 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
             @Override
             public void onTaskCompleted(List<Reportees> list) {
                 reporteesList = list;
-                adapter = new ReporteesAdapter(reporteesList, AdminFragment.this, loadedFrom);
-                rvSchedules.setAdapter(adapter);
-                rvSchedules.setLayoutManager(layoutManager);
+
+                setEmployeeAdapter(reporteesList);
 
                 if (mListener != null) {
                     mListener.hideLoading();
@@ -149,6 +154,12 @@ public class AdminFragment extends Fragment implements OnItemSelectedListener {
             }
         }, Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_REF_ID)).execute();
 
+    }
+
+    private void setEmployeeAdapter(List<Reportees> list) {
+        adapter = new ReporteesAdapter(list, AdminFragment.this, loadedFrom);
+        rvSchedules.setAdapter(adapter);
+        rvSchedules.setLayoutManager(layoutManager);
     }
 
     @Override

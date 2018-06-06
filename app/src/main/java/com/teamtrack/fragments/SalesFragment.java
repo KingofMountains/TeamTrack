@@ -24,9 +24,6 @@ import com.teamtrack.tasks.GetMeetingsTask;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class SalesFragment extends Fragment {
 
     private static final int NUMBER_OF_TABS = 3;

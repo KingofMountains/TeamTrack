@@ -8,7 +8,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -41,8 +40,8 @@ public class LocationService extends Service {
         @Override
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
-            Toast.makeText(LocationService.this, "" + location.getLatitude() + " & " + location.getLongitude(),
-                    Toast.LENGTH_SHORT).show();
+//            Toast.makeText(LocationService.this, "" + location.getLatitude() + " & " + location.getLongitude(),
+//                    Toast.LENGTH_SHORT).show();
             mLastLocation.set(location);
 
             updateLocation(location);

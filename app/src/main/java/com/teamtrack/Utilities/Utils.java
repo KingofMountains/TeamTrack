@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.teamtrack.R;
 
@@ -35,11 +36,12 @@ public class Utils {
         Calendar calendar = Calendar.getInstance();
         int hours = calendar.get(Calendar.HOUR_OF_DAY);
 
-        if (hours >= 9 && hours <= 17) {
+        if (hours >= 9 && hours < 18) {
+            Log.d("Location : ","Time is between 9am to 6pm");
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public static void showNotification(Context context, String text) {
