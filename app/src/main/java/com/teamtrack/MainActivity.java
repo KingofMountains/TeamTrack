@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     private void logout() {
 //        startActivity(new Intent(MainActivity.this, SplashActivity.class));
 //        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        Preferences.sharedInstance().remove(Preferences.Key.REPORTEE_LIST, Preferences.Key.CUSTOMER_LIST);
+        Preferences.sharedInstance().remove(Preferences.Key.REPORTEE_LIST, Preferences.Key.CUSTOMER_LIST, Preferences.Key.SELECTED_TAB);
         finish();
     }
 
@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_right, 0)
-                .add(R.id.fragment_container, fragment, "ScheduleDetailFragment")
+                .replace(R.id.fragment_container, fragment, "ScheduleDetailFragment")
                 .addToBackStack("ScheduleDetailFragment")
                 .commit();
     }

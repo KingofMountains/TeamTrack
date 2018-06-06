@@ -21,7 +21,7 @@ public class Preferences<T> {
         EMPLOYEE_TYPE,
         EMPLOYEE_REF_ID,
         REPORTEE_LIST,
-        CUSTOMER_LIST
+        SELECTED_TAB, CUSTOMER_LIST
     }
 
     private Preferences(Context context) {
@@ -80,6 +80,12 @@ public class Preferences<T> {
         commit();
     }
 
+    public void put(Key key, int value) {
+        edit();
+        mEditor.putInt(key.name(), value);
+        commit();
+    }
+
     public <T> void put(Key key, T response) {
         edit();
         String json = gson.toJson(response);
@@ -90,6 +96,11 @@ public class Preferences<T> {
     public String getString(Key key) {
         return sharedPreferences.getString(key.name(), null);
     }
+
+    public int getInt(Key key) {
+        return sharedPreferences.getInt(key.name(), 1);
+    }
+
 
     public ReporteeListResponse getReporteeResponse() {
         return gson.fromJson(getString(Key.REPORTEE_LIST), ReporteeListResponse.class);

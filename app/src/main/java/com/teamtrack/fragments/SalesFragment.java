@@ -98,6 +98,23 @@ public class SalesFragment extends Fragment {
         viewPager = view.findViewById(R.id.view_pager_sales);
 
         getMeetings();
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Preferences.sharedInstance().put(Preferences.Key.SELECTED_TAB, position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void getMeetings() {
@@ -116,7 +133,11 @@ public class SalesFragment extends Fragment {
                 viewPager.setAdapter(adapter);
                 tabLayout.setupWithViewPager(viewPager);
                 viewPager.setOffscreenPageLimit(3);
-                viewPager.setCurrentItem(1);
+                if (!Preferences.sharedInstance().getString(Preferences.Key.EMPLOYEE_TYPE).equalsIgnoreCase("MANAGER")) {
+                    viewPager.setCurrentItem(Preferences.sharedInstance().getInt(Preferences.Key.SELECTED_TAB));
+                } else {
+                    viewPager.setCurrentItem(1);
+                }
 
                 if (mListener != null) {
                     mListener.hideLoading();
